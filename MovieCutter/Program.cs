@@ -1,20 +1,17 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
 
-string videoPath = "C:\\Users\\User\\Downloads\\SampleVideo_1280x720_1mb.mp4";
-string outputFolder = "C:\\Users\\User\\Downloads\\SSSS";
+string videoPath = args[0];
+string fileName = Path.GetFileName(videoPath);
+string outputFolder = args.Length > 1 ? args[1] : "C:\\Users\\User\\Wideo\\" + fileName;
 
 Directory.CreateDirectory(outputFolder);
 
-// Wypakowanie ffmpeg.exe z zasobów (embedded resource)
-string ffmpegPath = ExtractFFmpeg();
-
-// Argumenty dla ffmpeg do rozbicia filmu na klatki PNG bez utraty jakości
 string arguments = $"-i \"{videoPath}\" -fps_mode passthrough \"{Path.Combine(outputFolder, "frame_%06d.png")}\"";
 
 var startInfo = new ProcessStartInfo
 {
-    FileName = ffmpegPath,
+    FileName = ExtractFFmpeg(),
     Arguments = arguments,
     UseShellExecute = false,
     RedirectStandardOutput = true,
@@ -26,7 +23,6 @@ using (var process = new Process { StartInfo = startInfo, EnableRaisingEvents = 
 {
     if (process != null)
     {
-        // Obsługa wyjścia w czasie rzeczywistym
         process.ErrorDataReceived += (sender, e) =>
         {
             if (!string.IsNullOrEmpty(e.Data))
