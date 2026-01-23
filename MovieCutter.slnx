@@ -4,7 +4,7 @@
     <Project Path="Domain/Domain.csproj" />
   </Folder>
   <Folder Name="/Infrastructure/">
-    <Project Path="JobsRunner/JobsRunner.csproj" Id="bf249682-2b96-4e3f-981b-d52ac857ac73" />
+    <Project Path="JobsRunner/JobsRunner.csproj" Id="fa3d412e-78c8-46c9-96b2-1900ffd4d9f4" />
     <Project Path="Persistance/Persistance.csproj" />
   </Folder>
   <Folder Name="/Presentation/">
