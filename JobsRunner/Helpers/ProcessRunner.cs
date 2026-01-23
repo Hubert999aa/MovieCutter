@@ -1,7 +1,7 @@
 ﻿using Serilog;
 using System.Diagnostics;
 
-namespace JobsRunner
+namespace JobsRunner.Helpers
 {
     public class ProcessRunner(ILogger<ProcessRunner> logger)
     {

@@ -4,7 +4,7 @@ using MassTransit;
 
 namespace JobsRunner
 {
-    public static class MassTransitConfiguration
+    public static class JobsRunnerStartupConfiguration
     {
         public static IServiceCollection ConfigureMassTransit(this IServiceCollection services, IConfiguration configuration, RabbitMQSettings rabbitMqSettings)
         {

@@ -17,7 +17,7 @@ var rabbitMqSettings = builder.Configuration
 builder.Services.AddSingleton(rabbitMqSettings);
 
 // MassTransit
-MassTransitConfiguration.ConfigureMassTransit(builder.Services, builder.Configuration, rabbitMqSettings);
+JobsRunnerStartupConfiguration.ConfigureMassTransit(builder.Services, builder.Configuration, rabbitMqSettings);
 
 
 
