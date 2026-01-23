@@ -1,12 +1,9 @@
-﻿namespace JobsRunner.Options
+﻿using Domain.TechnicalModels;
+
+namespace JobsRunner.Options
 {
-    public sealed class RabbitMQSettings
+    public sealed class RabbitMQExtendedSettings : RabbitMQBaseSettings
     {
-        public required string Host { get; init; }
-        public required string VirtualHost { get; init; }
-        public required string Username { get; init; }
-        public required string Password { get; init; }
-        public int Port { get; init; }
         public required QueueSettings Queues { get; init; }
     }
 

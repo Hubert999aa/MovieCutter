@@ -11,10 +11,8 @@ builder.Services.AddSerilog(config =>
 // RabbitMQ
 var rabbitMqSettings = builder.Configuration
     .GetSection("RabbitMQ")
-    .Get<RabbitMQSettings>()
+    .Get<RabbitMQExtendedSettings>()
     ?? throw new InvalidOperationException("RabbitMQ configuration is missing");
-
-builder.Services.AddSingleton(rabbitMqSettings);
 
 // MassTransit
 JobsRunnerStartupConfiguration.ConfigureMassTransit(builder.Services, builder.Configuration, rabbitMqSettings);

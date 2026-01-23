@@ -1,7 +1,6 @@
 using Application;
+using Domain.TechnicalModels;
 using Persistance;
-using Application.Functions.MovieCutter.SourceScraper.Queries.GetSourceLastVideosQuery;
-using Application.Mediator;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +9,8 @@ builder.Host.UseSerilog((ctx, cfg) =>
 {
     cfg.ReadFrom.Configuration(ctx.Configuration);
 });
+
+builder.Services.Configure<FolderPathsOptions>(builder.Configuration.GetSection("FolderPaths"));
 
 builder.Services.AddApplicationLayer(builder.Configuration);
 builder.Services.AddPersistanceLayer(builder.Configuration);

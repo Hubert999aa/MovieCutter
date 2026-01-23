@@ -1,10 +1,10 @@
 ﻿using Application.Mediator;
 using Domain.TechnicalModels;
 
-namespace Application.Functions.MovieCutter.SourceScraper.Queries.GetSourceLastVideosQuery
+namespace Application.Functions.MovieCutter.Source.Queries.GetSourceLastVideosQuery
 {
     public class GetSourceLastVideosQuery : IRequest<BaseResponse>
     {
-        public int IdSource { get; set; }
+        public required int IdSource { get; set; }
     }
 }

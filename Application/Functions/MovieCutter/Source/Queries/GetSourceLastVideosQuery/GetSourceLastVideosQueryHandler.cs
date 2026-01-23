@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using System.Text.Json;
 
-namespace Application.Functions.MovieCutter.SourceScraper.Queries.GetSourceLastVideosQuery
+namespace Application.Functions.MovieCutter.Source.Queries.GetSourceLastVideosQuery
 {
     public class GetSourceLastVideosQueryHandler(IMovieCutterDatabase _context) : IRequestHandler<GetSourceLastVideosQuery, BaseResponse>
     {

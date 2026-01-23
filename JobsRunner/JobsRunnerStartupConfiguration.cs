@@ -6,7 +6,7 @@ namespace JobsRunner
 {
     public static class JobsRunnerStartupConfiguration
     {
-        public static IServiceCollection ConfigureMassTransit(this IServiceCollection services, IConfiguration configuration, RabbitMQSettings rabbitMqSettings)
+        public static IServiceCollection ConfigureMassTransit(this IServiceCollection services, IConfiguration configuration, RabbitMQExtendedSettings rabbitMqSettings)
         {
             services.AddMassTransit(x =>
             {
