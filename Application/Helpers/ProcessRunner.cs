@@ -1,7 +1,8 @@
-﻿using Serilog;
+﻿using Microsoft.Extensions.Logging;
+using Serilog;
 using System.Diagnostics;
 
-namespace JobsRunner.Helpers
+namespace Application.Helpers
 {
     public class ProcessRunner(ILogger<ProcessRunner> logger)
     {
@@ -48,6 +49,33 @@ namespace JobsRunner.Helpers
                 {
                     Log.Fatal($"Nie udało się uruchomić procesu: {processInfo.FileName}.");
                     Environment.Exit(1);
+                }
+            }
+        }
+
+        public async static Task<T> RunProcessWithCustomBehaviour<T>(ProcessStartInfo processInfo, CancellationToken cancellationToken, Func<Process, Task<T>> customBehaviour)
+        {
+            using (var process = new Process { StartInfo = processInfo, EnableRaisingEvents = true })
+            {
+                if (process != null)
+                {
+                    process.Start();
+
+                    var customResult = await customBehaviour.Invoke(process);
+
+                    await process.WaitForExitAsync();
+
+                    process.Close();
+                    process.Dispose();
+
+                    return customResult;
+                }
+                else
+                {
+                    Log.Fatal($"Nie udało się uruchomić procesu: {processInfo.FileName}.");
+                    Environment.Exit(1);
+
+                    return default;
                 }
             }
         }

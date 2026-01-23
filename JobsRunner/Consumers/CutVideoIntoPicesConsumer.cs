@@ -1,5 +1,5 @@
 ﻿using Domain.ConsumersContracts;
-using JobsRunner.Helpers;
+using Application.Helpers;
 using MassTransit;
 using System.Diagnostics;
 
