@@ -4,11 +4,11 @@ using Domain.TechnicalModels;
 using MassTransit;
 using Microsoft.Extensions.Options;
 
-namespace Application.Functions.MovieCutter.Source.Queries.DownloadSelectedVideoQuery
+namespace Application.Functions.MovieCutter.VideoProcessing.DownloadVideo
 {
-    public class DownloadSelectedVideoQueryHandler(IPublishEndpoint _publishEndpoint, IOptions<FolderPathsOptions> _folderPathsOptions) : IRequestHandler<DownloadSelectedVideoQuery, BaseResponse>
+    public class DownloadVideoRequestHandler(IPublishEndpoint _publishEndpoint, IOptions<FolderPathsOptions> _folderPathsOptions) : IRequestHandler<DownloadVideoRequest, BaseResponse>
     {
-        public async Task<BaseResponse> Handle(DownloadSelectedVideoQuery request, CancellationToken cancellationToken)
+        public async Task<BaseResponse> Handle(DownloadVideoRequest request, CancellationToken cancellationToken)
         {
             var message = new DownloadVideoMessage
             {
