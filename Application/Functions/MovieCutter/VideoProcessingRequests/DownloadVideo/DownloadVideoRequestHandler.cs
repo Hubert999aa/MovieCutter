@@ -4,7 +4,7 @@ using Domain.TechnicalModels;
 using MassTransit;
 using Microsoft.Extensions.Options;
 
-namespace Application.Functions.MovieCutter.VideoProcessing.DownloadVideo
+namespace Application.Functions.MovieCutter.VideoProcessingRequests.DownloadVideo
 {
     public class DownloadVideoRequestHandler(IPublishEndpoint _publishEndpoint, IOptions<FolderPathsOptions> _folderPathsOptions) : IRequestHandler<DownloadVideoRequest, BaseResponse>
     {

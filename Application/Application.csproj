@@ -22,8 +22,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Functions\MovieCutter\VideoProcessing\CutVideoIntoPices\" />
-    <Folder Include="Functions\MovieCutter\VideoProcessing\CutVideoIntoFrames\" />
+    <Folder Include="Functions\MovieCutter\VideoProcessingRequests\CutVideoIntoPices\" />
+    <Folder Include="Functions\MovieCutter\VideoProcessingRequests\CutVideoIntoFrames\" />
+    <Folder Include="Functions\Maintenance\" />
   </ItemGroup>
 
 </Project>
