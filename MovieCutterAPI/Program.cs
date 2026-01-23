@@ -21,7 +21,7 @@ var app = builder.Build();
 app.UseAuthorization();
 
 app.MapControllers();
-
+/*
 using (var serviceScope = app.Services.CreateScope())
 {
     var services = serviceScope.ServiceProvider;
@@ -29,5 +29,5 @@ using (var serviceScope = app.Services.CreateScope())
 
     await mediator.Send(new GetSourceLastVideosQuery());
 }
-
+*/
 app.Run();
