@@ -6,6 +6,7 @@ using Application.Helpers;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using System.Text.Json;
+using Domain.TechnicalEnums;
 
 namespace Application.Functions.MovieCutter.Source.Queries.GetSourceLastVideosQuery
 {
@@ -15,10 +16,15 @@ namespace Application.Functions.MovieCutter.Source.Queries.GetSourceLastVideosQu
 
         public async Task<BaseResponse> Handle(GetSourceLastVideosQuery request, CancellationToken cancellationToken)
         {
-            var sourceBaseUrl = _context.Sources
+            var sourceBaseUrl = await _context.Sources
                 .Where(p => p.IdSource == request.IdSource)
                 .Select(p => p.BaseUrl)
-                .SingleOrDefaultAsync(cancellationToken);
+                .SingleOrDefaultAsync();
+
+            if (string.IsNullOrEmpty(sourceBaseUrl))
+            {
+                return new BaseResponse(false, ResponseStatus.ValidationError, "No url found");
+            }
 
             var processInfo = new ProcessStartInfo
             {
