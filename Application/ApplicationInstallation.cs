@@ -32,3 +32,15 @@ namespace Application
         }
     }
 }
+
+
+//ToDo:
+// 3. CQRS for Profile
+// 4. CQRS for Source
+
+// 6. Test the communication and working requests
+// 7. Expose functionalities by controlers endpoints
+
+
+//Ideas:
+// 1. Extend download feature, so we will be able to cut the video into frames straight after downloading

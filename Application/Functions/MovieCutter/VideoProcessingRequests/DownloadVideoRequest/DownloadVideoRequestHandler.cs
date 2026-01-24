@@ -1,5 +1,6 @@
 ﻿using Application.Mediator;
 using Domain.ConsumersContracts;
+using Domain.TechnicalEnums;
 using Domain.TechnicalModels;
 using MassTransit;
 using Microsoft.Extensions.Options;
@@ -10,6 +11,8 @@ namespace Application.Functions.MovieCutter.VideoProcessingRequests.DownloadVide
     {
         public async Task<BaseResponse> Handle(DownloadVideoRequest request, CancellationToken cancellationToken)
         {
+            if (string.IsNullOrEmpty(request.Url)) return new BaseResponse(false, ResponseStatus.ValidationError, "Url cannot be empty");
+
             var message = new DownloadVideoMessage
             {
                 Url = request.Url,
