@@ -35,6 +35,7 @@ namespace Application
 
 
 //ToDo:
+// 2. Add Maintenance commands
 // 3. CQRS for Profile
 // 4. CQRS for Source
 // 5. Add functionality of checking actual downloaded videos and select one for futher processing
