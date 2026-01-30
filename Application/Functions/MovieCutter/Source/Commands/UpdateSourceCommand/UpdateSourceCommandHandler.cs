@@ -22,6 +22,8 @@ namespace Application.Functions.MovieCutter.Source.Commands.UpdateSourceCommand
             if (source.SourceType != (SourceType)request.SourceType) source.SourceType = (SourceType)request.SourceType;
             if (source.IdProfile != request.IdProfile) source.IdProfile = request.IdProfile;
 
+            await _context.SaveChangesAsync();
+
             return new BaseResponse();
         }
     }
