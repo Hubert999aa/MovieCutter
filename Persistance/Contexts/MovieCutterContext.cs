@@ -12,6 +12,11 @@ namespace Persistance.Contexts
         public DbSet<Profile> Profiles { get; set; }
         public DbSet<Source> Sources { get; set; }
 
+        public Task MigrateAsync()
+        {
+            return Database.MigrateAsync();
+        }
+
         public async Task<int> SaveChangesAsync()
         {
             return await base.SaveChangesAsync();

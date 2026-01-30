@@ -1,4 +1,6 @@
 using Application;
+using Application.Functions.Maintenance.ApplyDatabaseMigrationsCommand;
+using Application.Mediator;
 using Domain.TechnicalModels;
 using Persistance;
 using Serilog;
@@ -22,13 +24,13 @@ var app = builder.Build();
 app.UseAuthorization();
 
 app.MapControllers();
-/*
+
 using (var serviceScope = app.Services.CreateScope())
 {
     var services = serviceScope.ServiceProvider;
     var mediator = services.GetRequiredService<IMediator>();
 
-    await mediator.Send(new GetSourceLastVideosQuery());
+    await mediator.Send(new ApplyDatabaseMigrationsCommand());
 }
-*/
+
 app.Run();

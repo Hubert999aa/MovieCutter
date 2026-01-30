@@ -9,6 +9,7 @@ namespace Application.Interfaces
         public DatabaseFacade Database { get; }
         public DbSet<Profile> Profiles { get; set; }
         public DbSet<Source> Sources { get; set; }
+        public Task MigrateAsync();
         public Task<int> SaveChangesAsync();
     }
 }
