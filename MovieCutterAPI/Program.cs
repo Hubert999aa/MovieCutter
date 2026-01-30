@@ -39,7 +39,6 @@ app.Run();
 
 
 //ToDo:
-// 3. Expose functionalities by controlers endpoints
 // 4. Test the communication and working requests
 // 5. Create tests for those elements
 
