@@ -5,9 +5,9 @@ namespace Application.Functions.MovieCutter.Source.Commands.CreateSourceCommand
 {
     public class CreateSourceCommand : IRequest<BaseResponse>
     {
-        public string Name { get; set; } = string.Empty;
-        public string BaseUrl { get; set; } = string.Empty;
-        public int SourceType { get; set; }
-        public int IdProfile { get; set; }
+        public required string Name { get; set; } = string.Empty;
+        public required string BaseUrl { get; set; } = string.Empty;
+        public required int SourceType { get; set; }
+        public required int IdProfile { get; set; }
     }
 }

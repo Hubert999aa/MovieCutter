@@ -5,10 +5,10 @@ namespace Application.Functions.MovieCutter.Source.Commands.UpdateSourceCommand
 {
     public class UpdateSourceCommand : IRequest<BaseResponse>
     {
-        public int IdSource { get; set; }
-        public string Name { get; set; } = string.Empty;
-        public string BaseUrl { get; set; } = string.Empty;
-        public int SourceType { get; set; }
-        public int IdProfile { get; set; }
+        public required int IdSource { get; set; }
+        public required string Name { get; set; } = string.Empty;
+        public required string BaseUrl { get; set; } = string.Empty;
+        public required int SourceType { get; set; }
+        public required int IdProfile { get; set; }
     }
 }

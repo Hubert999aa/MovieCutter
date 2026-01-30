@@ -5,6 +5,6 @@ namespace Application.Functions.MovieCutter.Profile.Commands.DeleteProfileComman
 {
     public class DeleteProfileCommand : IRequest<BaseResponse>
     {
-        public int IdProfile { get; set; }
+        public required int IdProfile { get; set; }
     }
 }

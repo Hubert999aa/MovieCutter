@@ -5,6 +5,6 @@ namespace Application.Functions.MovieCutter.Source.Commands.DeleteSourceCommand
 {
     public class DeleteSourceCommand : IRequest<BaseResponse>
     {
-        public int IdSource { get; set; }
+        public required int IdSource { get; set; }
     }
 }
