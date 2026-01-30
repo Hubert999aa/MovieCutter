@@ -34,3 +34,16 @@ using (var serviceScope = app.Services.CreateScope())
 }
 
 app.Run();
+
+
+
+
+//ToDo:
+// 3. Expose functionalities by controlers endpoints
+// 4. Test the communication and working requests
+// 5. Create tests for those elements
+
+
+//Ideas:
+// 1. Extend download feature, so we will be able to cut the video into frames straight after downloading
+// 2. Add functionality of checking actual downloaded videos and select one for futher processing

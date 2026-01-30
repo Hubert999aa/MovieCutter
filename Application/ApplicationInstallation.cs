@@ -32,15 +32,3 @@ namespace Application
         }
     }
 }
-
-
-//ToDo:
-// 2. Add Maintenance commands
-// 3. CQRS for Profile
-// 5. Add functionality of checking actual downloaded videos and select one for futher processing
-// 6. Test the communication and working requests
-// 7. Expose functionalities by controlers endpoints
-
-
-//Ideas:
-// 1. Extend download feature, so we will be able to cut the video into frames straight after downloading
