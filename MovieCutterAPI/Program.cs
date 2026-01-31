@@ -39,10 +39,10 @@ app.Run();
 
 
 //ToDo:
-// 4. Test the communication and working requests
-// 5. Create tests for those elements
+// 3. Test the communication and working requests - Profiles, Sources, video download already tested
+// 4. Create tests for those elements
 
 
 //Ideas:
 // 1. Extend download feature, so we will be able to cut the video into frames straight after downloading
-// 2. Add functionality of checking actual downloaded videos and select one for futher processing
+// 2. Add possibility to check current progress of the process
