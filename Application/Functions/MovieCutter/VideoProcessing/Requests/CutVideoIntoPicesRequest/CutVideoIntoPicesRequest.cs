@@ -2,7 +2,7 @@
 using Domain.ConsumersContracts;
 using Domain.TechnicalModels;
 
-namespace Application.Functions.MovieCutter.VideoProcessingRequests.CutVideoIntoPicesRequest
+namespace Application.Functions.MovieCutter.VideoProcessing.Requests.CutVideoIntoPicesRequest
 {
     public class CutVideoIntoPicesRequest : IRequest<BaseResponse>
     {

@@ -6,7 +6,7 @@ using Domain.TechnicalModels;
 using MassTransit;
 using Microsoft.Extensions.Options;
 
-namespace Application.Functions.MovieCutter.VideoProcessingRequests.CutVideoIntoFramesRequest
+namespace Application.Functions.MovieCutter.VideoProcessing.Requests.CutVideoIntoFramesRequest
 {
     public class CutVideoIntoFramesRequestHandler(IPublishEndpoint _publishEndpoint, IOptions<FolderPathsOptions> _folderPathsOptions) : IRequestHandler<CutVideoIntoFramesRequest, BaseResponse>
     {

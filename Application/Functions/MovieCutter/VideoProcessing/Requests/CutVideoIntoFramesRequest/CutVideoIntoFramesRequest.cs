@@ -1,7 +1,7 @@
 ﻿using Application.Mediator;
 using Domain.TechnicalModels;
 
-namespace Application.Functions.MovieCutter.VideoProcessingRequests.CutVideoIntoFramesRequest
+namespace Application.Functions.MovieCutter.VideoProcessing.Requests.CutVideoIntoFramesRequest
 {
     public class CutVideoIntoFramesRequest : IRequest<BaseResponse>
     {
