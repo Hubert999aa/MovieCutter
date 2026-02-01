@@ -11,6 +11,8 @@ namespace JobsRunner.Consumers
         {
             logger.LogInformation("Setup cutting into frames process");
 
+            Directory.CreateDirectory(context.Message.OutputFolder);
+
             var startInfo = new ProcessStartInfo
             {
                 FileName = "ffmpeg",

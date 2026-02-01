@@ -30,7 +30,8 @@ namespace Application.Functions.MovieCutter.VideoProcessing.Requests.CutVideoInt
             var message = new CutVideoIntoPicesMessage
             {
                 SourceVideoPath = request.SourceVideoFullPath,
-                NewVideoPath = _folderPathsOptions.Value.FramesFolderPath + FileNamer.GetVideoName(request.SourceVideoFullPath),
+                NewVideoPathWithoutExtension = _folderPathsOptions.Value.DownloadFolderPath + FileNamer.GetFileNameWithoutExtension(request.SourceVideoFullPath),
+                NewVideoExtension = FileNamer.GetFileExtension(request.SourceVideoFullPath),
                 NewPices = request.VideoPices
             };
 

@@ -4,7 +4,8 @@
     {
         public required IEnumerable<VideoPice> NewPices { get; set; }
         public required string SourceVideoPath { get; set; }
-        public required string NewVideoPath { get; set; }
+        public required string NewVideoPathWithoutExtension { get; set; }
+        public required string NewVideoExtension { get; set; }
     }
 
     public class VideoPice

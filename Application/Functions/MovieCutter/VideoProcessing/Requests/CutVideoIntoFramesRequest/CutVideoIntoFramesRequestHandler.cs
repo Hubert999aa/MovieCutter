@@ -14,12 +14,12 @@ namespace Application.Functions.MovieCutter.VideoProcessing.Requests.CutVideoInt
         {
             if (string.IsNullOrEmpty(request.SourceVideoFullPath)) return new BaseResponse(false, ResponseStatus.ValidationError, "SourceVideoFullPath cannot be empty");
 
-            var videoName = FileNamer.GetVideoName(request.SourceVideoFullPath);
+            var videoName = FileNamer.GetFileNameWithoutExtension(request.SourceVideoFullPath);
             var message = new CutVideoIntoFramesMessage
             {
                 SourceVideoPath = request.SourceVideoFullPath,
                 VideoName = videoName,
-                OutputFolder = _folderPathsOptions.Value.DownloadFolderPath + videoName,
+                OutputFolder = _folderPathsOptions.Value.FramesFolderPath + videoName + "\\",
             };
 
             await _publishEndpoint.Publish(message, cancellationToken);
