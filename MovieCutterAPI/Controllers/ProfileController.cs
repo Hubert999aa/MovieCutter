@@ -2,7 +2,7 @@
 using Application.Functions.MovieCutter.Profile.Commands.DeleteProfileCommand;
 using Application.Functions.MovieCutter.Profile.Commands.UpdateProfileCommand;
 using Application.Functions.MovieCutter.Profile.Queries.GetProfilesListQuery;
-using Application.Mediator;
+using MyMediator.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MovieCutterAPI.Controllers

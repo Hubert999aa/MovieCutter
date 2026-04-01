@@ -1,5 +1,5 @@
 ﻿using Application.Functions.MovieCutter.Files.Queries.GetVideoListFromDiskQuery;
-using Application.Mediator;
+using MyMediator.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MovieCutterAPI.Controllers

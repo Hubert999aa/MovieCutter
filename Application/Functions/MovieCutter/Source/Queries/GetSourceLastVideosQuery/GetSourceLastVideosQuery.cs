@@ -1,4 +1,4 @@
-﻿using Application.Mediator;
+﻿using MyMediator.Interfaces;
 using Domain.TechnicalModels;
 
 namespace Application.Functions.MovieCutter.Source.Queries.GetSourceLastVideosQuery

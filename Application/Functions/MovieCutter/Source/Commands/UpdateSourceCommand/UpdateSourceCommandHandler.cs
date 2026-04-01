@@ -1,5 +1,5 @@
 ﻿using Application.Interfaces;
-using Application.Mediator;
+using MyMediator.Interfaces;
 using Domain.BusinessEnums;
 using Domain.TechnicalModels;
 using Microsoft.EntityFrameworkCore;

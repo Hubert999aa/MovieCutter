@@ -1,5 +1,5 @@
 ﻿using Application.Interfaces;
-using Application.Mediator;
+using MyMediator.Interfaces;
 using Domain.TechnicalModels;
 
 namespace Application.Functions.MovieCutter.Profile.Commands.CreateProfileCommand

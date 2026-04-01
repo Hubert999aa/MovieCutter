@@ -1,4 +1,4 @@
-﻿using Application.Mediator;
+﻿using MyMediator.Interfaces;
 using Domain.ConsumersContracts;
 using Domain.TechnicalEnums;
 using Domain.TechnicalModels;

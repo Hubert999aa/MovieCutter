@@ -1,5 +1,5 @@
 ﻿using Application.Interfaces;
-using Application.Mediator;
+using MyMediator.Interfaces;
 using Domain.BusinessModels;
 using Domain.TechnicalModels;
 using Application.Helpers;
