@@ -1,9 +1,9 @@
 using Application;
 using Application.Functions.Maintenance.ApplyDatabaseMigrationsCommand;
 using MyMediator.Interfaces;
-using Domain.TechnicalModels;
 using Persistance;
 using Serilog;
+using Domain.TechnicalModels;
 
 var builder = WebApplication.CreateBuilder(args);
 

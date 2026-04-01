@@ -1,6 +1,6 @@
 ﻿using Application.Interfaces;
 using MyMediator.Interfaces;
-using Domain.TechnicalModels;
+using CoreModels.TechnicalModels;
 
 namespace Application.Functions.MovieCutter.Profile.Commands.CreateProfileCommand
 {

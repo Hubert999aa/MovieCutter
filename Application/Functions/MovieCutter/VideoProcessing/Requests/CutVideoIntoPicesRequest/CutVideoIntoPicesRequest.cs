@@ -1,6 +1,6 @@
 ﻿using MyMediator.Interfaces;
 using Domain.ConsumersContracts;
-using Domain.TechnicalModels;
+using CoreModels.TechnicalModels;
 
 namespace Application.Functions.MovieCutter.VideoProcessing.Requests.CutVideoIntoPicesRequest
 {

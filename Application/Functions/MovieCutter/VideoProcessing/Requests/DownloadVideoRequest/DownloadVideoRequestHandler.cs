@@ -1,9 +1,10 @@
 ﻿using MyMediator.Interfaces;
 using Domain.ConsumersContracts;
-using Domain.TechnicalEnums;
-using Domain.TechnicalModels;
+using CoreModels.TechnicalEnums;
+using CoreModels.TechnicalModels;
 using MassTransit;
 using Microsoft.Extensions.Options;
+using Domain.TechnicalModels;
 
 namespace Application.Functions.MovieCutter.VideoProcessing.Requests.DownloadVideoRequest
 {

@@ -1,7 +1,7 @@
 ﻿using Application.Interfaces;
 using MyMediator.Interfaces;
 using Domain.BusinessEnums;
-using Domain.TechnicalModels;
+using CoreModels.TechnicalModels;
 
 namespace Application.Functions.MovieCutter.Source.Commands.CreateSourceCommand
 {
