@@ -1,0 +1,113 @@
+:host {
+  display: block;
+}
+
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  padding: 0 2.5rem;
+  background: rgba(6, 12, 16, 0.88);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(77, 217, 172, 0.1);
+}
+
+// ── Brand ───────────────────────────────────────────────────────────────────
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  text-decoration: none;
+  flex-shrink: 0;
+
+  &:focus-visible {
+    outline: 2px solid #4dd9ac;
+    outline-offset: 4px;
+    border-radius: 6px;
+  }
+}
+
+.brand-icon {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+
+  svg {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+.brand-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.65rem;
+  letter-spacing: 0.06em;
+  color: #fff;
+  line-height: 1;
+}
+
+.brand-accent {
+  color: #4dd9ac;
+}
+
+// ── Links ────────────────────────────────────────────────────────────────────
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  margin-left: auto;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 1.05rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.76rem;
+  font-weight: 500;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+  border: 1px solid transparent;
+  transition: color 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+
+  i {
+    font-size: 0.82rem;
+  }
+
+  &:hover {
+    color: #4dd9ac;
+    background: rgba(77, 217, 172, 0.07);
+    border-color: rgba(77, 217, 172, 0.18);
+  }
+
+  &.active {
+    color: #4dd9ac;
+    background: rgba(77, 217, 172, 0.1);
+    border-color: rgba(77, 217, 172, 0.3);
+  }
+
+  &:focus-visible {
+    outline: 2px solid #4dd9ac;
+    outline-offset: 2px;
+  }
+}
+
+.nav-divider {
+  width: 1px;
+  height: 18px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 0 0.4rem;
+}

@@ -1,0 +1,85 @@
+<div class="home">
+
+  <!-- Background layers -->
+  <div class="bg-grid" aria-hidden="true"></div>
+  <div class="bg-glow bg-glow--left" aria-hidden="true"></div>
+  <div class="bg-glow bg-glow--right" aria-hidden="true"></div>
+  <div class="bg-noise" aria-hidden="true"></div>
+
+  <!-- Film strip decorations -->
+  <div class="filmstrip filmstrip--top" aria-hidden="true">
+    @for (hole of filmHoles; track $index) {
+      <div class="filmstrip__hole"></div>
+    }
+  </div>
+  <div class="filmstrip filmstrip--bottom" aria-hidden="true">
+    @for (hole of filmHoles; track $index) {
+      <div class="filmstrip__hole"></div>
+    }
+  </div>
+
+  <!-- Hero -->
+  <main class="hero">
+    <div class="hero__badge">
+      <span class="badge__dot" aria-hidden="true"></span>
+      <span>Narzędzie do obróbki wideo</span>
+    </div>
+
+    <h1 class="hero__title">
+      <span class="title-line title-line--1">Movie</span><span class="title-line title-line--2">Cutter</span>
+    </h1>
+
+    <p class="hero__subtitle">
+      Pobieraj, przycinaj i eksportuj filmy<br>
+      szybko i bez zbędnych komplikacji.
+    </p>
+
+    <div class="hero__actions">
+      <a routerLink="/pobieranie">
+        <p-button
+          label="Pobierz film"
+          icon="pi pi-download"
+          size="large"
+          styleClass="btn-primary-custom"
+        />
+      </a>
+      <a routerLink="/edytor">
+        <p-button
+          label="Otwórz edytor"
+          icon="pi pi-video"
+          size="large"
+          [outlined]="true"
+          styleClass="btn-outline-custom"
+        />
+      </a>
+    </div>
+
+    <!-- Feature cards -->
+    <div class="features" role="list">
+      <div class="feature-card" role="listitem">
+        <div class="feature-card__icon" aria-hidden="true">
+          <i class="pi pi-download"></i>
+        </div>
+        <h2 class="feature-card__title">Pobieranie</h2>
+        <p class="feature-card__desc">Pobieraj filmy z popularnych platform bezpośrednio do swojego projektu.</p>
+      </div>
+
+      <div class="feature-card" role="listitem">
+        <div class="feature-card__icon" aria-hidden="true">
+          <i class="pi pi-sliders-h"></i>
+        </div>
+        <h2 class="feature-card__title">Przycinanie</h2>
+        <p class="feature-card__desc">Precyzyjnie wycinaj fragmenty wideo z dokładnością do pojedynczej klatki.</p>
+      </div>
+
+      <div class="feature-card" role="listitem">
+        <div class="feature-card__icon" aria-hidden="true">
+          <i class="pi pi-send"></i>
+        </div>
+        <h2 class="feature-card__title">Eksport</h2>
+        <p class="feature-card__desc">Eksportuj gotowe klipy w wybranym formacie i rozdzielczości.</p>
+      </div>
+    </div>
+  </main>
+
+</div>
