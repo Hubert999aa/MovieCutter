@@ -14,6 +14,10 @@ namespace Application.Functions.MovieCutter.Profile.Queries.GetProfilesListQuery
                 {
                     p.IdProfile,
                     p.Name,
+                    Sources = p.Sources
+                        .Select(x => x.SourceType.ToString())
+                        .OrderBy(x => x)
+                        .ToList(),
                 })
                 .ToListAsync();
 
