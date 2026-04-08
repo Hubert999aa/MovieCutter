@@ -10,8 +10,6 @@ import { sourcesConfig } from '@shared/static-data/sources-config';
 import { avatarColors } from '@shared/static-data/avatar-colors';
 import { Profile } from '@shared/models/profile';
 
-
-
 @Component({
   selector: 'app-profile',
   imports: [ButtonModule, DialogModule, InputTextModule, ReactiveFormsModule],
@@ -33,6 +31,10 @@ export class ProfileComponent implements OnInit {
   });
 
   ngOnInit(): void {
+    this.loadProfiles();
+  }
+
+  loadProfiles(): void {
     this.profileService.loadProfiles().subscribe(data => {
       this.profiles.set(data)
     })
@@ -49,7 +51,7 @@ export class ProfileComponent implements OnInit {
     this.profileService.createProfile({ name: this.nameControl.value.trim() }).subscribe({
       next: created => {
         this.dialogVisible.set(false);
-        this.router.navigate(['/profil', created.idProfile]);
+        //this.router.navigate(['/profil', created.idProfile]);
       },
       error: () => {
         // TODO: pokazać komunikat błędu
@@ -73,6 +75,7 @@ export class ProfileComponent implements OnInit {
     this.profileService.deleteProfile(idProfile).subscribe({
       next: () => {
         this.pendingDeleteId.set(null);
+        this.loadProfiles();
       },
       error: () => {
         // TODO: pokazać komunikat błędu
