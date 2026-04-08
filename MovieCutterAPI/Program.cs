@@ -19,9 +19,21 @@ builder.Services.AddPersistanceLayer(builder.Configuration);
 
 builder.Services.AddControllers();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("OpenCors", policy =>
+    {
+        policy
+            .AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader();
+    });
+});
+
 var app = builder.Build();
 
-app.UseAuthorization();
+app.UseCors("OpenCors");
+
 app.MapControllers();
 
 using (var serviceScope = app.Services.CreateScope())
