@@ -49,9 +49,9 @@ export class ProfileComponent implements OnInit {
     if (this.nameControl.invalid) return;
 
     this.profileService.createProfile({ name: this.nameControl.value.trim() }).subscribe({
-      next: created => {
+      next: createdProfileId => {
         this.dialogVisible.set(false);
-        //this.router.navigate(['/profil', created.idProfile]);
+        this.router.navigate(['/profil', createdProfileId]);
       },
       error: () => {
         // TODO: pokazać komunikat błędu

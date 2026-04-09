@@ -1,0 +1,277 @@
+<div class="edit-page">
+
+  <!-- Background layers -->
+  <div class="bg-grid" aria-hidden="true"></div>
+  <div class="bg-glow bg-glow--left" aria-hidden="true"></div>
+  <div class="bg-glow bg-glow--right" aria-hidden="true"></div>
+
+  <div class="page-content">
+
+    <!-- Breadcrumb / back -->
+    <nav class="page-nav" aria-label="Nawigacja pomocnicza">
+      <a routerLink="/profil" class="back-link">
+        <i class="pi pi-arrow-left" aria-hidden="true"></i>
+        <span>Profile</span>
+      </a>
+    </nav>
+
+    <!-- Profile identity block -->
+    <header class="profile-header">
+      <div
+        class="profile-avatar"
+        [style.background]="getAvatarColor(nameControl.value) + '1a'"
+        [style.border-color]="getAvatarColor(nameControl.value) + '40'"
+        [style.color]="getAvatarColor(nameControl.value)"
+        aria-hidden="true"
+      >
+        {{ getInitials(nameControl.value) }}
+      </div>
+
+      <div class="profile-identity">
+        <label class="field-label" for="profile-name">Nazwa profilu</label>
+        <input
+          id="profile-name"
+          type="text"
+          pInputText
+          class="name-input"
+          placeholder="Wpisz nazwę profilu"
+          [formControl]="nameControl"
+          autocomplete="off"
+          aria-required="true"
+        />
+      </div>
+
+      <div class="header-actions">
+        <p-button
+          label="Zapisz zmiany"
+          icon="pi pi-check"
+          [disabled]="nameControl.invalid"
+          (onClick)="saveProfile()"
+          aria-label="Zapisz zmiany profilu"
+        />
+      </div>
+    </header>
+
+    <!-- Sources section -->
+    <section aria-labelledby="sources-title">
+      <div class="section-header">
+        <div>
+          <h2 id="sources-title" class="section-title">Źródła</h2>
+          <p class="section-subtitle">Miejsca, z których pobieramy filmy dla tego profilu.</p>
+        </div>
+        <p-button
+          label="Dodaj źródło"
+          icon="pi pi-plus"
+          (onClick)="openAddDialog()"
+          aria-label="Dodaj nowe źródło"
+        />
+      </div>
+
+      @if (sources().length > 0) {
+        <ul class="source-list" aria-label="Lista źródeł">
+          @for (source of sources(); track source.id) {
+            <li
+              class="source-item"
+              [class.source-item--deleting]="pendingDeleteId() === source.id"
+              [style.--source-color]="platformConfig[source.type].color"
+            >
+              @if (pendingDeleteId() !== source.id) {
+
+                <div class="source-icon" aria-hidden="true">
+                  @if (platformConfig[source.type].icon) {
+                    <i [class]="platformConfig[source.type].icon"></i>
+                  } @else {
+                    <span class="tt-text">TT</span>
+                  }
+                </div>
+
+                <div class="source-info">
+                  <div class="source-meta">
+                    <span class="source-name">{{ source.name }}</span>
+                    <span
+                      class="source-type-badge"
+                      [style.color]="platformConfig[source.type].color"
+                      [style.background]="platformConfig[source.type].color + '18'"
+                      [style.border-color]="platformConfig[source.type].color + '30'"
+                    >{{ platformConfig[source.type].label }}</span>
+                  </div>
+                  <a
+                    [href]="source.baseUrl"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="source-url"
+                    [attr.aria-label]="'Otwórz ' + source.name + ' w nowej karcie'"
+                  >
+                    <i class="pi pi-external-link" aria-hidden="true"></i>
+                    {{ source.baseUrl }}
+                  </a>
+                </div>
+
+                <div class="source-actions">
+                  <p-button
+                    icon="pi pi-pencil"
+                    [outlined]="true"
+                    size="small"
+                    (onClick)="openEditDialog(source)"
+                    [attr.aria-label]="'Edytuj źródło ' + source.name"
+                  />
+                  <button
+                    class="btn-delete"
+                    type="button"
+                    (click)="startDelete(source.id)"
+                    [attr.aria-label]="'Usuń źródło ' + source.name"
+                  >
+                    <i class="pi pi-trash" aria-hidden="true"></i>
+                  </button>
+                </div>
+
+              } @else {
+
+                <div class="source-confirm" role="alertdialog" [attr.aria-label]="'Potwierdź usunięcie źródła ' + source.name">
+                  <p class="confirm-text">
+                    <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+                    Usunąć źródło <strong>{{ source.name }}</strong>?
+                  </p>
+                  <div class="confirm-actions">
+                    <p-button
+                      label="Anuluj"
+                      [outlined]="true"
+                      size="small"
+                      (onClick)="cancelDelete()"
+                      aria-label="Anuluj usuwanie"
+                    />
+                    <p-button
+                      label="Usuń"
+                      icon="pi pi-trash"
+                      size="small"
+                      severity="danger"
+                      (onClick)="confirmDelete(source.id)"
+                      [attr.aria-label]="'Potwierdź usunięcie źródła ' + source.name"
+                    />
+                  </div>
+                </div>
+
+              }
+            </li>
+          }
+        </ul>
+      } @else {
+        <div class="empty-state" role="status">
+          <div class="empty-icon" aria-hidden="true">
+            <i class="pi pi-link"></i>
+          </div>
+          <h3 class="empty-title">Brak źródeł</h3>
+          <p class="empty-desc">
+            Dodaj pierwsze źródło, aby móc pobierać filmy dla tego profilu.
+          </p>
+          <p-button
+            label="Dodaj pierwsze źródło"
+            icon="pi pi-plus"
+            (onClick)="openAddDialog()"
+            aria-label="Dodaj pierwsze źródło"
+          />
+        </div>
+      }
+    </section>
+
+  </div>
+</div>
+
+<!-- Add / Edit source dialog -->
+<p-dialog
+  [header]="dialogHeader()"
+  [modal]="true"
+  [(visible)]="dialogVisible"
+  [style]="{ width: '30rem' }"
+  [breakpoints]="{ '640px': '92vw' }"
+  [draggable]="false"
+  [resizable]="false"
+  styleClass="mc-dialog"
+>
+  <form [formGroup]="sourceForm" class="dialog-body" (ngSubmit)="confirmSource()">
+
+    <div class="dialog-field">
+      <label class="dialog-label" for="source-type">Platforma</label>
+      <p-select
+        inputId="source-type"
+        formControlName="type"
+        [options]="sourceTypeOptions"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Wybierz platformę"
+        [fluid]="true"
+        [appendTo]="'body'"
+        ariaLabel="Wybierz platformę"
+      >
+        <ng-template #selectedItem let-opt>
+          <div class="select-option">
+            @if (opt?.icon) {
+              <i [class]="opt.icon" [style.color]="opt.color" aria-hidden="true"></i>
+            } @else {
+              <span class="tt-icon" [style.color]="opt.color" aria-hidden="true">TT</span>
+            }
+            <span>{{ opt.label }}</span>
+          </div>
+        </ng-template>
+        <ng-template #item let-opt>
+          <div class="select-option">
+            @if (opt.icon) {
+              <i [class]="opt.icon" [style.color]="opt.color" aria-hidden="true"></i>
+            } @else {
+              <span class="tt-icon" [style.color]="opt.color" aria-hidden="true">TT</span>
+            }
+            <span>{{ opt.label }}</span>
+          </div>
+        </ng-template>
+      </p-select>
+    </div>
+
+    <div class="dialog-field">
+      <label class="dialog-label" for="source-name">Nazwa źródła</label>
+      <input
+        id="source-name"
+        type="text"
+        pInputText
+        class="dialog-input"
+        placeholder="np. Kanał główny"
+        formControlName="name"
+        autocomplete="off"
+        aria-required="true"
+      />
+    </div>
+
+    <div class="dialog-field">
+      <label class="dialog-label" for="source-url">Adres bazowy</label>
+      <input
+        id="source-url"
+        type="url"
+        pInputText
+        class="dialog-input"
+        placeholder="np. https://www.youtube.com/@channel"
+        formControlName="baseUrl"
+        autocomplete="off"
+        aria-required="true"
+      />
+      <p class="dialog-hint">Podstawowy URL profilu lub kanału na danej platformie.</p>
+    </div>
+
+  </form>
+
+  <ng-template #footer>
+    <div class="dialog-footer">
+      <p-button
+        label="Anuluj"
+        [outlined]="true"
+        (onClick)="dialogVisible.set(false)"
+        aria-label="Anuluj"
+      />
+      <p-button
+        [label]="editingSourceId() !== null ? 'Zapisz zmiany' : 'Dodaj źródło'"
+        icon="pi pi-check"
+        [disabled]="sourceForm.invalid"
+        (onClick)="confirmSource()"
+        [attr.aria-label]="editingSourceId() !== null ? 'Zapisz zmiany źródła' : 'Dodaj źródło'"
+      />
+    </div>
+  </ng-template>
+</p-dialog>

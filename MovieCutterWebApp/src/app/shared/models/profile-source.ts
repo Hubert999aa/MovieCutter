@@ -1,7 +1,8 @@
 import { ProfileSourceType } from '@src/app/shared/enums/profile-source-type';
 
-export interface Profile {
-  idProfile: number;
+export interface ProfileSource {
+  id: number;
+  type: ProfileSourceType;
   name: string;
-  sources: ProfileSourceType[];
+  baseUrl: string;
 }

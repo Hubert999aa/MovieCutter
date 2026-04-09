@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 
 import { HttpWrapper } from '@core/providers/http-wrapper';
 import { Profile } from '@shared/models/profile';

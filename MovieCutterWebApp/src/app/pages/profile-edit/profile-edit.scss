@@ -1,0 +1,479 @@
+// ── Layout ────────────────────────────────────────────────────────────────────
+
+.edit-page {
+  position: relative;
+  min-height: 100dvh;
+  background: var(--mc-bg);
+  overflow: hidden;
+}
+
+// ── Background ────────────────────────────────────────────────────────────────
+
+.bg-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(77, 217, 172, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(96, 165, 250, 0.03) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+}
+
+.bg-glow {
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  filter: blur(120px);
+  pointer-events: none;
+
+  &--left {
+    top: -80px;
+    left: -160px;
+    background: radial-gradient(circle, rgba(77, 217, 172, 0.07) 0%, transparent 70%);
+  }
+
+  &--right {
+    bottom: -80px;
+    right: -160px;
+    background: radial-gradient(circle, rgba(96, 165, 250, 0.07) 0%, transparent 70%);
+  }
+}
+
+// ── Page content ──────────────────────────────────────────────────────────────
+
+.page-content {
+  position: relative;
+  z-index: 1;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 88px 2rem 5rem;
+}
+
+// ── Back navigation ───────────────────────────────────────────────────────────
+
+.page-nav {
+  margin-bottom: 2rem;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.76rem;
+  font-weight: 500;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.4);
+  text-decoration: none;
+  padding: 0.35rem 0.75rem 0.35rem 0.5rem;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  transition: color 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+
+  i { font-size: 0.8rem; }
+
+  &:hover {
+    color: var(--mc-accent);
+    background: rgba(77, 217, 172, 0.07);
+    border-color: rgba(77, 217, 172, 0.18);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--mc-accent);
+    outline-offset: 2px;
+  }
+}
+
+// ── Profile header block ──────────────────────────────────────────────────────
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.5rem 1.75rem;
+  margin-bottom: 2.5rem;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.02);
+  flex-wrap: wrap;
+}
+
+.profile-avatar {
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  border: 1px solid;
+  display: grid;
+  place-items: center;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.3rem;
+  letter-spacing: 0.05em;
+  user-select: none;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.profile-identity {
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.field-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.name-input {
+  background: transparent !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 8px !important;
+  color: #fff !important;
+  font-family: 'Bebas Neue', sans-serif !important;
+  font-size: 1.6rem !important;
+  letter-spacing: 0.06em !important;
+  padding: 0.4rem 0.75rem !important;
+  width: 100% !important;
+
+  &:focus {
+    border-color: var(--mc-accent) !important;
+    box-shadow: 0 0 0 3px rgba(77, 217, 172, 0.1) !important;
+    outline: none !important;
+  }
+
+  &::placeholder {
+    color: rgba(255, 255, 255, 0.2) !important;
+    font-size: 1.2rem !important;
+  }
+}
+
+.header-actions {
+  flex-shrink: 0;
+}
+
+// ── Section header ────────────────────────────────────────────────────────────
+
+.section-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.section-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2rem;
+  letter-spacing: 0.06em;
+  color: #fff;
+  margin: 0 0 0.2rem;
+  line-height: 1;
+}
+
+.section-subtitle {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.76rem;
+  color: rgba(255, 255, 255, 0.32);
+  margin: 0;
+}
+
+// ── Source list ───────────────────────────────────────────────────────────────
+
+.source-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.source-item {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1rem 1.25rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-left: 3px solid color-mix(in srgb, var(--source-color) 35%, transparent);
+  background: rgba(255, 255, 255, 0.025);
+  transition: border-color 0.2s ease, background 0.2s ease;
+  animation: cardIn 0.3s ease both;
+
+  &:hover:not(&--deleting) {
+    background: color-mix(in srgb, var(--source-color) 4%, transparent);
+    border-color: color-mix(in srgb, var(--source-color) 22%, transparent);
+    border-left-color: var(--source-color);
+  }
+
+  &--deleting {
+    border-color: rgba(239, 68, 68, 0.3);
+    border-left-color: #ef4444;
+    background: rgba(239, 68, 68, 0.04);
+  }
+}
+
+// ── Source icon ───────────────────────────────────────────────────────────────
+
+.source-icon {
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--source-color) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--source-color) 25%, transparent);
+  color: var(--source-color);
+
+  i { font-size: 1rem; }
+
+  .tt-text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+}
+
+// ── Source info ───────────────────────────────────────────────────────────────
+
+.source-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.source-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.source-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.15rem;
+  letter-spacing: 0.05em;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.source-type-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.12rem 0.5rem;
+  border-radius: 4px;
+  border: 1px solid;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.source-url {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.3);
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  transition: color 0.15s ease;
+
+  i { font-size: 0.65rem; flex-shrink: 0; }
+
+  &:hover {
+    color: var(--source-color);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--mc-accent);
+    outline-offset: 2px;
+    border-radius: 3px;
+  }
+}
+
+// ── Source actions ────────────────────────────────────────────────────────────
+
+.source-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.btn-delete {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.3);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: color 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+
+  i { font-size: 0.82rem; }
+
+  &:hover {
+    color: #ef4444;
+    border-color: rgba(239, 68, 68, 0.35);
+    background: rgba(239, 68, 68, 0.07);
+  }
+
+  &:focus-visible {
+    outline: 2px solid #ef4444;
+    outline-offset: 2px;
+  }
+}
+
+// ── Delete confirmation inline ────────────────────────────────────────────────
+
+.source-confirm {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  animation: fadeIn 0.18s ease both;
+}
+
+.confirm-text {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+
+  i {
+    color: #f59e0b;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+  }
+
+  strong {
+    color: #fff;
+    font-weight: 600;
+  }
+}
+
+.confirm-actions {
+  display: flex;
+  gap: 0.6rem;
+  flex-shrink: 0;
+}
+
+// ── Empty state ───────────────────────────────────────────────────────────────
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 5rem 2rem;
+  text-align: center;
+  gap: 1rem;
+  border-radius: 16px;
+  border: 1px dashed rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.01);
+}
+
+.empty-icon {
+  width: 64px;
+  height: 64px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  background: rgba(77, 217, 172, 0.07);
+  border: 1px solid rgba(77, 217, 172, 0.15);
+  margin-bottom: 0.25rem;
+
+  i {
+    font-size: 1.6rem;
+    color: var(--mc-accent);
+  }
+}
+
+.empty-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.75rem;
+  letter-spacing: 0.06em;
+  color: #fff;
+  margin: 0;
+}
+
+.empty-desc {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.76rem;
+  line-height: 1.8;
+  color: rgba(255, 255, 255, 0.32);
+  max-width: 360px;
+  margin: 0 0 0.25rem;
+}
+
+// ── Dialog field ──────────────────────────────────────────────────────────────
+
+.dialog-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+// ── Select option template ────────────────────────────────────────────────────
+
+.select-option {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+
+  i { font-size: 0.9rem; }
+
+  .tt-icon {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    width: 14px;
+    text-align: center;
+  }
+}
+
+// ── Animations ────────────────────────────────────────────────────────────────
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}

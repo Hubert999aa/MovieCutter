@@ -18,6 +18,10 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/profile/profile').then(m => m.ProfileComponent),
   },
   {
+    path: 'profil/:id',
+    loadComponent: () => import('./pages/profile-edit/profile-edit').then(m => m.ProfileEditComponent),
+  },
+  {
     path: '**',
     redirectTo: '',
   },

@@ -1,7 +1,7 @@
-import { ProfileSource } from '@shared/enums/profile-source';
+import { ProfileSourceType } from '@src/app/shared/enums/profile-source-type';
 
-export const profileSourceMap: Record<string, ProfileSource> = {
-  'Youtube': ProfileSource.YouTube,
-  'Instagram': ProfileSource.Instagram,
-  'TikTok': ProfileSource.TikTok,
+export const profileSourceMap: Record<string, ProfileSourceType> = {
+  'Youtube': ProfileSourceType.YouTube,
+  'Instagram': ProfileSourceType.Instagram,
+  'TikTok': ProfileSourceType.TikTok,
 };
