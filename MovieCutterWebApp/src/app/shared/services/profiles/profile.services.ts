@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
 
 import { ProfileApi } from './profile.api';
-import { profileSourceMap } from '@shared/static-data/profile-source-mapping';
+import { profileSourceMap } from '@shared/static-data/source-type-mapping';
 import { Profile } from '@shared/models/profile';
 import { CreateProfileRequest } from '@shared/models/api-models/profile/create-profile.request';
 import { CreateProfileResponse } from '@shared/models/api-models/profile/create-profile.response';

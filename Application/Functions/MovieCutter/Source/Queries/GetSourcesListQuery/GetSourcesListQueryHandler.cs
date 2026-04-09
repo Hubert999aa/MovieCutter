@@ -1,7 +1,7 @@
 ﻿using Application.Interfaces;
-using MyMediator.Interfaces;
 using CoreModels.TechnicalModels;
 using Microsoft.EntityFrameworkCore;
+using MyMediator.Interfaces;
 
 namespace Application.Functions.MovieCutter.Source.Queries.GetSourcesListQuery
 {
@@ -15,7 +15,8 @@ namespace Application.Functions.MovieCutter.Source.Queries.GetSourcesListQuery
                 {
                     p.IdSource,
                     p.Name,
-                    p.SourceType
+                    p.BaseUrl,
+                    SourceType = p.SourceType.ToString()
                 })
                 .ToListAsync();
 
