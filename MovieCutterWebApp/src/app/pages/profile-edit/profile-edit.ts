@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, signal, inject, computed } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, computed } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
@@ -8,8 +8,8 @@ import { SelectModule } from 'primeng/select';
 
 import { ProfileSourceType } from '@src/app/shared/enums/profile-source-type';
 import { sourcesConfig } from '@shared/static-data/sources-config';
-import { avatarColors } from '@shared/static-data/avatar-colors';
 import { ProfileSource } from '@src/app/shared/models/profile-source';
+import { getAvatarColor, getInitials } from '@shared/helpers/avatar.helper';
 
 interface SourceTypeOption {
   label: string;
@@ -27,6 +27,8 @@ interface SourceTypeOption {
 })
 export class ProfileEditComponent {
   readonly platformConfig = sourcesConfig;
+  readonly getAvatarColor = getAvatarColor;
+  readonly getInitials = getInitials;
 
   readonly sourceTypeOptions: SourceTypeOption[] = Object.values(ProfileSourceType).map(type => ({
     label: sourcesConfig[type].label,
@@ -105,15 +107,5 @@ export class ProfileEditComponent {
   saveProfile(): void {
     if (this.nameControl.invalid) return;
     // TODO: podłączyć do API
-  }
-
-  getAvatarColor(name: string): string {
-    let hash = 0;
-    for (let i = 0; i < name.length; i++) hash += name.charCodeAt(i);
-    return avatarColors[hash % avatarColors.length];
-  }
-
-  getInitials(name: string): string {
-    return name.split(' ').map(w => w[0]).filter(Boolean).join('').toUpperCase().slice(0, 2) || '?';
   }
 }

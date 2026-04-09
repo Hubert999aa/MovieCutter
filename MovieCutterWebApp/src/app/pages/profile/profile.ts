@@ -7,8 +7,8 @@ import { InputTextModule } from 'primeng/inputtext';
 
 import { ProfileService } from '@shared/services/profiles/profile.services';
 import { sourcesConfig } from '@shared/static-data/sources-config';
-import { avatarColors } from '@shared/static-data/avatar-colors';
 import { Profile } from '@shared/models/profile';
+import { getAvatarColor, getInitials } from '@shared/helpers/avatar.helper';
 
 @Component({
   selector: 'app-profile',
@@ -21,7 +21,9 @@ export class ProfileComponent implements OnInit {
   private readonly router  = inject(Router);
   private readonly profileService = inject(ProfileService);
   readonly platformConfig = sourcesConfig;
-
+  readonly getAvatarColor = getAvatarColor;
+  readonly getInitials = getInitials;
+  
   dialogVisible = signal(false);
   profiles: WritableSignal<Profile[]> = signal([]);
   pendingDeleteId: WritableSignal<number | null> = signal(null);
@@ -82,15 +84,5 @@ export class ProfileComponent implements OnInit {
         this.pendingDeleteId.set(null);
       },
     });
-  }
-
-  getAvatarColor(name: string): string {
-    let hash = 0;
-    for (let i = 0; i < name.length; i++) hash += name.charCodeAt(i);
-    return avatarColors[hash % avatarColors.length];
-  }
-
-  getInitials(name: string): string {
-    return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
   }
 }
