@@ -9,10 +9,11 @@ import { ProfileService } from '@shared/services/profiles/profile.services';
 import { sourcesConfig } from '@shared/static-data/sources-config';
 import { Profile } from '@shared/models/profile';
 import { getAvatarColor, getInitials } from '@shared/helpers/avatar.helper';
+import { LoaderComponent } from '@shared/components/loader/loader';
 
 @Component({
   selector: 'app-profile',
-  imports: [ButtonModule, DialogModule, InputTextModule, ReactiveFormsModule],
+  imports: [ButtonModule, DialogModule, InputTextModule, ReactiveFormsModule, LoaderComponent],
   templateUrl: './profile.html',
   styleUrl: './profile.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -23,10 +24,11 @@ export class ProfileComponent implements OnInit {
   readonly platformConfig = sourcesConfig;
   readonly getAvatarColor = getAvatarColor;
   readonly getInitials = getInitials;
-  
+
   dialogVisible = signal(false);
   profiles: WritableSignal<Profile[]> = signal([]);
   pendingDeleteId: WritableSignal<number | null> = signal(null);
+  readonly profilesLoading = signal(false);
   nameControl = new FormControl('', {
     nonNullable: true,
     validators: [Validators.required],
@@ -37,9 +39,17 @@ export class ProfileComponent implements OnInit {
   }
 
   loadProfiles(): void {
-    this.profileService.loadProfiles().subscribe(data => {
-      this.profiles.set(data)
-    })
+    this.profilesLoading.set(true);
+    this.profileService.loadProfiles().subscribe({
+      next: data => {
+        this.profiles.set(data);
+        this.profilesLoading.set(false);
+      },
+      error: () => {
+        this.profilesLoading.set(false);
+        // TODO: pokazać komunikat błędu
+      },
+    });
   }
 
   openAddDialog(): void {

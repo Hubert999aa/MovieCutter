@@ -13,6 +13,7 @@ import { ProfileSource } from '@shared/models/profile-source';
 import { ProfileService } from '@shared/services/profiles/profile.services';
 import { SourceService } from '@shared/services/sources/source.service';
 import { getAvatarColor, getInitials } from '@shared/helpers/avatar.helper';
+import { LoaderComponent } from '@shared/components/loader/loader';
 
 interface SourceTypeOption {
   label: string;
@@ -23,7 +24,7 @@ interface SourceTypeOption {
 
 @Component({
   selector: 'app-profile-edit',
-  imports: [RouterLink, ButtonModule, DialogModule, InputTextModule, SelectModule, ReactiveFormsModule],
+  imports: [RouterLink, ButtonModule, DialogModule, InputTextModule, SelectModule, ReactiveFormsModule, LoaderComponent],
   templateUrl: './profile-edit.html',
   styleUrl: './profile-edit.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -38,6 +39,7 @@ export class ProfileEditComponent implements OnInit {
   private readonly isValid = !!this.idProfile && !!this.profileName;
   
   readonly sources = signal<ProfileSource[]>([]);
+  readonly sourcesLoading = signal(false);
   readonly dialogVisible = signal(false);
   readonly editingSourceId = signal<number | null>(null);
   readonly pendingDeleteId = signal<number | null>(null);
@@ -76,12 +78,15 @@ export class ProfileEditComponent implements OnInit {
   }
 
   private loadSources(): void {
+    this.sourcesLoading.set(true);
     this.sourceService.loadSources(this.idProfile).subscribe({
       next: sources => {
         this.sources.set(sources);
+        this.sourcesLoading.set(false);
       },
       error: () => {
-      // TODO: pokazać komunikat błędu
+        this.sourcesLoading.set(false);
+        // TODO: pokazać komunikat błędu
       },
     });
   }

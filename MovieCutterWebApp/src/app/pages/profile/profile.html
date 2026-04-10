@@ -20,8 +20,13 @@
       />
     </header>
 
+    <!-- Loader -->
+    @if (profilesLoading()) {
+      <app-loader variant="cards" [count]="3" />
+    }
+
     <!-- Profile grid -->
-    @if (profiles().length > 0) {
+    @if (!profilesLoading() && profiles().length > 0) {
       <ul class="profile-grid" aria-label="Lista profili">
         @for (profile of profiles(); track profile.idProfile) {
           <li
@@ -121,7 +126,7 @@
     }
 
     <!-- Empty state -->
-    @if (profiles().length === 0) {
+    @if (!profilesLoading() && profiles().length === 0) {
       <div class="empty-state" role="status">
         <div class="empty-icon" aria-hidden="true">
           <i class="pi pi-users"></i>
