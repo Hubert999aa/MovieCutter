@@ -1,14 +1,17 @@
-import { Component, ChangeDetectionStrategy, signal, computed } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, ChangeDetectionStrategy, signal, inject, computed, OnInit, DestroyRef } from '@angular/core';
+import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 
-import { ProfileSourceType } from '@src/app/shared/enums/profile-source-type';
+import { ProfileSourceType } from '@shared/enums/profile-source-type';
 import { sourcesConfig } from '@shared/static-data/sources-config';
-import { ProfileSource } from '@src/app/shared/models/profile-source';
+import { profileSourceTypeToSourceType } from '@shared/static-data/source-type-mapping';
+import { ProfileSource } from '@shared/models/profile-source';
+import { ProfileService } from '@shared/services/profiles/profile.services';
+import { SourceService } from '@shared/services/sources/source.service';
 import { getAvatarColor, getInitials } from '@shared/helpers/avatar.helper';
 
 interface SourceTypeOption {
@@ -25,11 +28,23 @@ interface SourceTypeOption {
   styleUrl: './profile-edit.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ProfileEditComponent {
+export class ProfileEditComponent implements OnInit {
+  private readonly router = inject(Router);
+  private readonly profileService = inject(ProfileService);
+  private readonly sourceService = inject(SourceService);
+
+  private readonly idProfile = Number(inject(ActivatedRoute).snapshot.paramMap.get('id'));
+  private readonly profileName = (history.state as Record<string, unknown>)['profileName'] as string | undefined;
+  private readonly isValid = !!this.idProfile && !!this.profileName;
+  
+  readonly sources = signal<ProfileSource[]>([]);
+  readonly dialogVisible = signal(false);
+  readonly editingSourceId = signal<number | null>(null);
+  readonly pendingDeleteId = signal<number | null>(null);
+
   readonly platformConfig = sourcesConfig;
   readonly getAvatarColor = getAvatarColor;
   readonly getInitials = getInitials;
-
   readonly sourceTypeOptions: SourceTypeOption[] = Object.values(ProfileSourceType).map(type => ({
     label: sourcesConfig[type].label,
     value: type,
@@ -37,19 +52,10 @@ export class ProfileEditComponent {
     color: sourcesConfig[type].color,
   }));
 
-  readonly nameControl = new FormControl('Kanał Główny', {
+  readonly nameControl = new FormControl(this.profileName ?? '', {
     nonNullable: true,
     validators: [Validators.required, Validators.maxLength(64)],
   });
-
-  readonly sources = signal<ProfileSource[]>([
-    { id: 1, type: ProfileSourceType.YouTube, name: 'Kanał główny', baseUrl: 'https://www.youtube.com/@mychannel' },
-    { id: 2, type: ProfileSourceType.Instagram, name: 'Profil Instagram', baseUrl: 'https://www.instagram.com/mychannel' },
-  ]);
-
-  readonly dialogVisible = signal(false);
-  readonly editingSourceId = signal<number | null>(null);
-  readonly pendingDeleteId = signal<number | null>(null);
 
   readonly dialogHeader = computed(() =>
     this.editingSourceId() !== null ? 'Edytuj źródło' : 'Nowe źródło'
@@ -61,7 +67,24 @@ export class ProfileEditComponent {
     baseUrl: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
   });
 
-  private nextId = 3;
+  ngOnInit(): void {
+    if (!this.isValid) {
+      this.router.navigate(['/profil']);
+    };
+
+    this.loadSources();
+  }
+
+  private loadSources(): void {
+    this.sourceService.loadSources(this.idProfile).subscribe({
+      next: sources => {
+        this.sources.set(sources);
+      },
+      error: () => {
+      // TODO: pokazać komunikat błędu
+      },
+    });
+  }
 
   openAddDialog(): void {
     this.editingSourceId.set(null);
@@ -80,15 +103,32 @@ export class ProfileEditComponent {
     const { type, name, baseUrl } = this.sourceForm.getRawValue();
     if (!type) return;
 
+    const sourceType = profileSourceTypeToSourceType[type];
     const editId = this.editingSourceId();
+
     if (editId !== null) {
-      this.sources.update(list =>
-        list.map(s => s.id === editId ? { ...s, type, name, baseUrl } : s)
-      );
+      this.sourceService.updateSource({ idSource: editId, idProfile: this.idProfile, name, baseUrl, sourceType })
+        .subscribe({
+          next: () => {
+            this.loadSources();
+            this.dialogVisible.set(false);
+          },
+          error: () => {
+          // TODO: pokazać komunikat błędu
+          },
+        });
     } else {
-      this.sources.update(list => [...list, { id: this.nextId++, type, name, baseUrl }]);
+      this.sourceService.createSource({ idProfile: this.idProfile, name, baseUrl, sourceType })
+        .subscribe({
+          next: created => {
+            this.loadSources();
+            this.dialogVisible.set(false);
+          },
+          error: () => {
+          // TODO: pokazać komunikat błędu
+          },
+        });
     }
-    this.dialogVisible.set(false);
   }
 
   startDelete(id: number): void {
@@ -100,12 +140,26 @@ export class ProfileEditComponent {
   }
 
   confirmDelete(id: number): void {
-    this.sources.update(list => list.filter(s => s.id !== id));
-    this.pendingDeleteId.set(null);
+    this.sourceService.deleteSource(id)
+      .subscribe({
+        next: () => {
+          this.loadSources()
+          this.pendingDeleteId.set(null);
+        },
+        error: () => this.pendingDeleteId.set(null),
+      });
   }
 
   saveProfile(): void {
     if (this.nameControl.invalid) return;
-    // TODO: podłączyć do API
+
+    this.profileService.updateProfile({ idProfile: this.idProfile, name: this.nameControl.value }).subscribe({
+      next: () => {
+        this.loadSources();
+      },
+      error: () => {
+      // TODO: pokazać komunikat błędu
+      },
+    });
   }
 }

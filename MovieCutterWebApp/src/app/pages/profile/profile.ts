@@ -50,10 +50,13 @@ export class ProfileComponent implements OnInit {
   confirmAdd(): void {
     if (this.nameControl.invalid) return;
 
-    this.profileService.createProfile({ name: this.nameControl.value.trim() }).subscribe({
+    const profileName = this.nameControl.value.trim();
+    this.profileService.createProfile({ name: profileName }).subscribe({
       next: createdProfileId => {
         this.dialogVisible.set(false);
-        this.router.navigate(['/profil', createdProfileId]);
+        this.router.navigate(['/profil', createdProfileId], {
+          state: { profileName },
+        });
       },
       error: () => {
         // TODO: pokazać komunikat błędu
@@ -61,8 +64,10 @@ export class ProfileComponent implements OnInit {
     });
   }
 
-  editProfile(idProfile: number): void {
-    this.router.navigate(['/profil', idProfile]);
+  editProfile(profile: Profile): void {
+    this.router.navigate(['/profil', profile.idProfile], {
+      state: { profileName: profile.name },
+    });
   }
 
   startDelete(idProfile: number): void {
