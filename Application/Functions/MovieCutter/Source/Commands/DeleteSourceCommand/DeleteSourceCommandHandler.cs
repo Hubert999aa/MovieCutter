@@ -1,6 +1,6 @@
 ﻿using Application.Interfaces;
-using Application.Mediator;
-using Domain.TechnicalModels;
+using MyMediator.Interfaces;
+using CoreModels.TechnicalModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Functions.MovieCutter.Source.Commands.DeleteSourceCommand

@@ -1,0 +1,227 @@
+// ── Google Fonts ─────────────────────────────────────────────────────────────
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+// ── PrimeIcons ────────────────────────────────────────────────────────────────
+@import 'primeicons/primeicons.css';
+
+// ── Design tokens ─────────────────────────────────────────────────────────────
+:root {
+  --mc-bg:           #060c10;
+  --mc-surface:      #0b1820;
+  --mc-border:       rgba(255, 255, 255, 0.07);
+  --mc-accent:       #4dd9ac;
+  --mc-accent-dim:   rgba(77, 217, 172, 0.12);
+  --mc-blue:         #60a5fa;
+  --mc-text:         #ffffff;
+  --mc-text-muted:   rgba(255, 255, 255, 0.4);
+}
+
+// ── Reset & base ──────────────────────────────────────────────────────────────
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: var(--mc-bg);
+  color: var(--mc-text);
+  font-family: 'JetBrains Mono', monospace;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// ── Scrollbar ─────────────────────────────────────────────────────────────────
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--mc-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(77, 217, 172, 0.25);
+  border-radius: 3px;
+
+  &:hover {
+    background: rgba(77, 217, 172, 0.45);
+  }
+}
+
+// ── PrimeNG overrides ─────────────────────────────────────────────────────────
+.p-button {
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 0.82rem !important;
+  letter-spacing: 0.05em !important;
+  font-weight: 600 !important;
+}
+
+.p-button.p-button-lg {
+  padding: 0.75rem 1.6rem !important;
+}
+
+// Primary button — teal
+.p-button:not(.p-button-outlined):not(.p-button-text):not(.p-button-link) {
+  background: var(--mc-accent) !important;
+  border-color: var(--mc-accent) !important;
+  color: #03140d !important;
+
+  &:hover:not(:disabled) {
+    background: #6ee7c3 !important;
+    border-color: #6ee7c3 !important;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--mc-accent) !important;
+    outline-offset: 3px !important;
+  }
+}
+
+// Outlined button
+.p-button.p-button-outlined {
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  color: rgba(255, 255, 255, 0.65) !important;
+  background: transparent !important;
+
+  &:hover:not(:disabled) {
+    border-color: rgba(96, 165, 250, 0.45) !important;
+    color: var(--mc-blue) !important;
+    background: rgba(96, 165, 250, 0.07) !important;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--mc-accent) !important;
+    outline-offset: 3px !important;
+  }
+}
+
+// ── MC Dialog (global — PrimeNG appends dialogs to body) ──────────────────────
+.mc-dialog {
+  .p-dialog {
+    background: #0d1a24 !important;
+    border: 1px solid rgba(77, 217, 172, 0.18) !important;
+    border-radius: 14px !important;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6) !important;
+    color: #fff !important;
+  }
+
+  .p-dialog-header {
+    background: transparent !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07) !important;
+    padding: 1.25rem 1.5rem !important;
+  }
+
+  .p-dialog-title {
+    font-family: 'Bebas Neue', sans-serif !important;
+    font-size: 1.4rem !important;
+    letter-spacing: 0.06em !important;
+    color: #fff !important;
+  }
+
+  .p-dialog-content {
+    background: transparent !important;
+    padding: 1.5rem !important;
+    color: #fff !important;
+  }
+
+  .p-dialog-footer {
+    background: transparent !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.07) !important;
+    padding: 1rem 1.5rem !important;
+  }
+
+  .p-dialog-close-button {
+    color: rgba(255, 255, 255, 0.4) !important;
+    &:hover { color: #fff !important; background: rgba(255,255,255,0.07) !important; }
+  }
+
+  // Input inside dialog
+  .dialog-input.p-inputtext,
+  input.dialog-input {
+    width: 100% !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    border-radius: 8px !important;
+    color: #fff !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.9rem !important;
+    padding: 0.6rem 0.85rem !important;
+
+    &:focus {
+      border-color: var(--mc-accent) !important;
+      box-shadow: 0 0 0 3px rgba(77, 217, 172, 0.12) !important;
+      outline: none !important;
+    }
+
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.25) !important;
+    }
+  }
+}
+
+// ── MC Select overlay (appended to body, outside .mc-dialog) ─────────────────
+.p-select {
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 0.88rem !important;
+  width: 100%;
+}
+
+.p-select-overlay {
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 0.88rem !important;
+  background: #0d1a24 !important;
+  border: 1px solid rgba(77, 217, 172, 0.18) !important;
+  border-radius: 10px !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55) !important;
+
+  .p-select-option {
+    color: rgba(255, 255, 255, 0.7) !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.88rem !important;
+    padding: 0.55rem 0.9rem !important;
+    transition: background 0.15s ease, color 0.15s ease !important;
+
+    &:hover,
+    &.p-select-option-selected {
+      background: rgba(77, 217, 172, 0.08) !important;
+      color: #fff !important;
+    }
+
+    &.p-focus {
+      background: rgba(77, 217, 172, 0.08) !important;
+      color: #fff !important;
+    }
+  }
+}
+
+// Dialog content helpers (rendered inside .mc-dialog, appended to body)
+.dialog-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.dialog-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.dialog-hint {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.28);
+  margin: 0.25rem 0 0;
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}

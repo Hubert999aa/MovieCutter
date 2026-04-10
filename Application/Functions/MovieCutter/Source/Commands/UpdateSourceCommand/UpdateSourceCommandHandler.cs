@@ -1,7 +1,7 @@
 ﻿using Application.Interfaces;
-using Application.Mediator;
+using MyMediator.Interfaces;
 using Domain.BusinessEnums;
-using Domain.TechnicalModels;
+using CoreModels.TechnicalModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Functions.MovieCutter.Source.Commands.UpdateSourceCommand

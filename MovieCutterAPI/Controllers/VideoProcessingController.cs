@@ -1,7 +1,7 @@
 ﻿using Application.Functions.MovieCutter.VideoProcessing.Requests.CutVideoIntoFramesRequest;
 using Application.Functions.MovieCutter.VideoProcessing.Requests.CutVideoIntoPicesRequest;
 using Application.Functions.MovieCutter.VideoProcessing.Requests.DownloadVideoRequest;
-using Application.Mediator;
+using MyMediator.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MovieCutterAPI.Controllers

@@ -1,0 +1,161 @@
+// ── Shimmer keyframe ──────────────────────────────────────────────────────────
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position:  400px 0; }
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.04) 0%,
+    rgba(77, 217, 172, 0.10) 40%,
+    rgba(255, 255, 255, 0.04) 80%
+  );
+  background-size: 800px 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+  border-radius: 6px;
+}
+
+// ── Shared reset ──────────────────────────────────────────────────────────────
+.loader-cards,
+.loader-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+// ── Cards variant (mirrors .profile-grid / .profile-card) ────────────────────
+.loader-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.loader-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 14px;
+}
+
+.lc-main {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.lc-avatar {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+}
+
+.lc-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.lc-name {
+  height: 14px;
+  width: 65%;
+  border-radius: 6px;
+}
+
+.lc-badges {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.lc-badge {
+  height: 20px;
+  width: 28px;
+  border-radius: 6px;
+}
+
+.lc-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.lc-btn {
+  height: 30px;
+  width: 72px;
+  border-radius: 8px;
+}
+
+.lc-btn-sm {
+  height: 30px;
+  width: 30px;
+  border-radius: 8px;
+}
+
+// ── Rows variant (mirrors .source-list / .source-item) ───────────────────────
+.loader-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.loader-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+}
+
+.lr-icon {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+}
+
+.lr-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.lr-line {
+  height: 12px;
+  border-radius: 6px;
+
+  &--wide   { width: 55%; }
+  &--narrow { width: 38%; }
+}
+
+.lr-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.lr-btn {
+  height: 30px;
+  width: 30px;
+  border-radius: 8px;
+}
+
+.lr-btn-sm {
+  height: 30px;
+  width: 30px;
+  border-radius: 8px;
+}

@@ -1,0 +1,42 @@
+.page-stub {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100dvh;
+  padding: 2rem;
+  text-align: center;
+  gap: 1.25rem;
+}
+
+.stub-icon {
+  width: 72px;
+  height: 72px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  background: rgba(77, 217, 172, 0.08);
+  border: 1px solid rgba(77, 217, 172, 0.18);
+
+  i {
+    font-size: 1.75rem;
+    color: #4dd9ac;
+  }
+}
+
+.stub-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 3rem;
+  letter-spacing: 0.06em;
+  color: #fff;
+  margin: 0;
+}
+
+.stub-desc {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+  line-height: 1.8;
+  color: rgba(255, 255, 255, 0.38);
+  max-width: 400px;
+  margin: 0;
+}

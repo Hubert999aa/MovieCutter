@@ -1,5 +1,5 @@
-﻿using Application.Mediator;
-using Domain.TechnicalModels;
+﻿using MyMediator.Interfaces;
+using CoreModels.TechnicalModels;
 
 namespace Application.Functions.MovieCutter.Source.Queries.GetSourcesListQuery
 {

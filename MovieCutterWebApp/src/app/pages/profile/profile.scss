@@ -1,0 +1,322 @@
+// ── Layout ───────────────────────────────────────────────────────────────────
+
+.profile-page {
+  position: relative;
+  min-height: 100dvh;
+  background: var(--mc-bg);
+  overflow: hidden;
+}
+
+.bg-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(77, 217, 172, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(96, 165, 250, 0.03) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+}
+
+.bg-glow {
+  position: absolute;
+  top: -120px;
+  right: -160px;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  filter: blur(120px);
+  background: radial-gradient(circle, rgba(96, 165, 250, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.page-content {
+  position: relative;
+  z-index: 1;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 100px 2rem 4rem;
+}
+
+// ── Header ────────────────────────────────────────────────────────────────────
+
+.page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+  flex-wrap: wrap;
+}
+
+.page-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 3rem;
+  letter-spacing: 0.06em;
+  color: #fff;
+  margin: 0 0 0.25rem;
+  line-height: 1;
+}
+
+.page-subtitle {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.35);
+  margin: 0;
+}
+
+// ── Profile grid ──────────────────────────────────────────────────────────────
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  @media (max-width: 900px) { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 560px) { grid-template-columns: 1fr; }
+}
+
+// ── Profile card ──────────────────────────────────────────────────────────────
+
+.profile-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.4rem;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.025);
+  transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+  animation: cardIn 0.35s ease both;
+
+  &:hover:not(&--deleting) {
+    border-color: rgba(77, 217, 172, 0.2);
+    background: rgba(77, 217, 172, 0.03);
+    transform: translateY(-2px);
+  }
+
+  &--deleting {
+    border-color: rgba(239, 68, 68, 0.35);
+    background: rgba(239, 68, 68, 0.04);
+  }
+}
+
+.card-main {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+// ── Avatar ────────────────────────────────────────────────────────────────────
+
+.card-avatar {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  border: 1px solid;
+  display: grid;
+  place-items: center;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: 0.05em;
+  user-select: none;
+}
+
+// ── Card info ─────────────────────────────────────────────────────────────────
+
+.card-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.card-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.35rem;
+  letter-spacing: 0.05em;
+  color: #fff;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-no-sources {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.25);
+  font-style: italic;
+}
+
+// ── Source badges ─────────────────────────────────────────────────────────────
+
+.card-sources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.source-badge {
+  display: inline-grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--badge-color) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--badge-color) 30%, transparent);
+  color: var(--badge-color);
+  font-size: 0.72rem;
+  transition: transform 0.15s ease, background 0.15s ease;
+
+  i { font-size: 0.75rem; }
+
+  &__text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+  }
+
+  &:hover {
+    transform: scale(1.15);
+    background: color-mix(in srgb, var(--badge-color) 22%, transparent);
+  }
+}
+
+// ── Card actions ──────────────────────────────────────────────────────────────
+
+.card-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.btn-delete {
+  margin-left: auto;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.3);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: color 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+
+  i { font-size: 0.82rem; }
+
+  &:hover {
+    color: #ef4444;
+    border-color: rgba(239, 68, 68, 0.35);
+    background: rgba(239, 68, 68, 0.07);
+  }
+
+  &:focus-visible {
+    outline: 2px solid #ef4444;
+    outline-offset: 2px;
+  }
+}
+
+// ── Delete confirm overlay ────────────────────────────────────────────────────
+
+.card-confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(239, 68, 68, 0.2);
+  animation: fadeIn 0.18s ease both;
+}
+
+.confirm-text {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+
+  i {
+    color: #f59e0b;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+  }
+
+  strong {
+    color: #fff;
+    font-weight: 600;
+  }
+}
+
+.confirm-actions {
+  display: flex;
+  gap: 0.6rem;
+}
+
+// ── Empty state ───────────────────────────────────────────────────────────────
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 6rem 2rem;
+  text-align: center;
+  gap: 1rem;
+}
+
+.empty-icon {
+  width: 72px;
+  height: 72px;
+  display: grid;
+  place-items: center;
+  border-radius: 18px;
+  background: rgba(77, 217, 172, 0.08);
+  border: 1px solid rgba(77, 217, 172, 0.16);
+  margin-bottom: 0.5rem;
+
+  i {
+    font-size: 1.8rem;
+    color: #4dd9ac;
+  }
+}
+
+.empty-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2rem;
+  letter-spacing: 0.06em;
+  color: #fff;
+  margin: 0;
+}
+
+.empty-desc {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  line-height: 1.8;
+  color: rgba(255, 255, 255, 0.35);
+  max-width: 380px;
+  margin: 0 0 0.5rem;
+}
+
+// Dialog content styles — see global styles.scss
+
+// ── Animations ────────────────────────────────────────────────────────────────
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}

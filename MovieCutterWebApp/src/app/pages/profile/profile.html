@@ -1,0 +1,194 @@
+<div class="profile-page">
+
+  <!-- Background -->
+  <div class="bg-grid" aria-hidden="true"></div>
+  <div class="bg-glow" aria-hidden="true"></div>
+
+  <div class="page-content">
+
+    <!-- Header -->
+    <header class="page-header">
+      <div class="header-text">
+        <h1 class="page-title">Profile</h1>
+        <p class="page-subtitle">Zarządzaj profilami i przypisanymi do nich źródłami.</p>
+      </div>
+      <p-button
+        label="Nowy profil"
+        icon="pi pi-plus"
+        (onClick)="openAddDialog()"
+        aria-label="Dodaj nowy profil"
+      />
+    </header>
+
+    <!-- Loader -->
+    @if (profilesLoading()) {
+      <app-loader variant="cards" [count]="3" />
+    }
+
+    <!-- Profile grid -->
+    @if (!profilesLoading() && profiles().length > 0) {
+      <ul class="profile-grid" aria-label="Lista profili">
+        @for (profile of profiles(); track profile.idProfile) {
+          <li
+            class="profile-card"
+            [class.profile-card--deleting]="pendingDeleteId() === profile.idProfile"
+          >
+            <!-- Main content -->
+            <div class="card-main">
+              <div
+                class="card-avatar"
+                [style.background]="getAvatarColor(profile.name) + '1a'"
+                [style.border-color]="getAvatarColor(profile.name) + '40'"
+                [style.color]="getAvatarColor(profile.name)"
+                aria-hidden="true"
+              >
+                {{ getInitials(profile.name) }}
+              </div>
+
+              <div class="card-info">
+                <h2 class="card-name">{{ profile.name }}</h2>
+
+                @if (profile.sources.length > 0) {
+                  <div class="card-sources" role="list" [attr.aria-label]="'Źródła profilu ' + profile.name">
+                    @for (source of profile.sources; track source) {
+                      <span
+                        class="source-badge"
+                        role="listitem"
+                        [style.--badge-color]="platformConfig[source].color"
+                        [attr.aria-label]="platformConfig[source].label"
+                        [title]="platformConfig[source].label"
+                      >
+                        @if (platformConfig[source].icon) {
+                          <i [class]="platformConfig[source].icon" aria-hidden="true"></i>
+                        } @else {
+                          <span class="source-badge__text" aria-hidden="true">TT</span>
+                        }
+                      </span>
+                    }
+                  </div>
+                } @else {
+                  <span class="card-no-sources">Brak przypisanych źródeł</span>
+                }
+              </div>
+            </div>
+
+            <!-- Normal actions -->
+            @if (pendingDeleteId() !== profile.idProfile) {
+              <div class="card-actions">
+                <p-button
+                  label="Edytuj"
+                  icon="pi pi-pencil"
+                  [outlined]="true"
+                  size="small"
+                  (onClick)="editProfile(profile)"
+                  [attr.aria-label]="'Edytuj profil ' + profile.name"
+                />
+                <button
+                  class="btn-delete"
+                  type="button"
+                  (click)="startDelete(profile.idProfile)"
+                  [attr.aria-label]="'Usuń profil ' + profile.name"
+                >
+                  <i class="pi pi-trash" aria-hidden="true"></i>
+                </button>
+              </div>
+            }
+
+            <!-- Delete confirmation overlay -->
+            @if (pendingDeleteId() === profile.idProfile) {
+              <div class="card-confirm" role="alertdialog" [attr.aria-label]="'Potwierdź usunięcie profilu ' + profile.name">
+                <p class="confirm-text">
+                  <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+                  Usunąć <strong>{{ profile.name }}</strong>?
+                </p>
+                <div class="confirm-actions">
+                  <p-button
+                    label="Anuluj"
+                    [outlined]="true"
+                    size="small"
+                    (onClick)="cancelDelete()"
+                    aria-label="Anuluj usuwanie"
+                  />
+                  <p-button
+                    label="Usuń"
+                    icon="pi pi-trash"
+                    size="small"
+                    severity="danger"
+                    (onClick)="confirmDelete(profile.idProfile)"
+                    [attr.aria-label]="'Potwierdź usunięcie profilu ' + profile.name"
+                  />
+                </div>
+              </div>
+            }
+          </li>
+        }
+      </ul>
+    }
+
+    <!-- Empty state -->
+    @if (!profilesLoading() && profiles().length === 0) {
+      <div class="empty-state" role="status">
+        <div class="empty-icon" aria-hidden="true">
+          <i class="pi pi-users"></i>
+        </div>
+        <h2 class="empty-title">Brak profili</h2>
+        <p class="empty-desc">Nie masz jeszcze żadnych profili. Utwórz pierwszy, aby zacząć.</p>
+        <p-button
+          label="Dodaj pierwszy profil"
+          icon="pi pi-plus"
+          (onClick)="openAddDialog()"
+          aria-label="Dodaj pierwszy profil"
+        />
+      </div>
+    }
+
+  </div>
+
+</div>
+
+<!-- Add profile dialog -->
+<p-dialog
+  header="Nowy profil"
+  [modal]="true"
+  [(visible)]="dialogVisible"
+  [style]="{ width: '26rem' }"
+  [breakpoints]="{ '640px': '92vw' }"
+  [draggable]="false"
+  [resizable]="false"
+  styleClass="mc-dialog"
+>
+  <div class="dialog-body">
+    <label class="dialog-label" for="profile-name">Nazwa profilu</label>
+    <input
+      id="profile-name"
+      type="text"
+      pInputText
+      class="dialog-input"
+      placeholder="np. Kanał Główny"
+      [formControl]="nameControl"
+      (keydown.enter)="confirmAdd()"
+      autocomplete="off"
+      aria-required="true"
+    />
+    <p class="dialog-hint">Po utworzeniu profilu przejdziesz do widoku edycji, gdzie możesz dodać źródła i skonfigurować szczegóły.</p>
+  </div>
+
+  <ng-template #footer>
+    <div class="dialog-footer">
+      <p-button
+        label="Anuluj"
+        [outlined]="true"
+        (onClick)="dialogVisible.set(false)"
+        aria-label="Anuluj tworzenie profilu"
+      />
+      <p-button
+        label="Utwórz"
+        icon="pi pi-arrow-right"
+        iconPos="right"
+        [disabled]="nameControl.invalid"
+        (onClick)="confirmAdd()"
+        aria-label="Utwórz profil i przejdź do edycji"
+      />
+    </div>
+  </ng-template>
+</p-dialog>

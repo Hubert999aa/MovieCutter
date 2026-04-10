@@ -1,6 +1,6 @@
 ﻿using Application.Interfaces;
-using Application.Mediator;
-using Domain.TechnicalModels;
+using MyMediator.Interfaces;
+using CoreModels.TechnicalModels;
 
 namespace Application.Functions.MovieCutter.Profile.Commands.CreateProfileCommand
 {
@@ -20,7 +20,7 @@ namespace Application.Functions.MovieCutter.Profile.Commands.CreateProfileComman
             await _context.Profiles.AddAsync(newProfile);
             await _context.SaveChangesAsync();
 
-            return new BaseResponse();
+            return new BaseResponse(newProfile.IdProfile);
         }
     }
 }

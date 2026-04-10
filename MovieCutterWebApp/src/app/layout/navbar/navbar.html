@@ -1,0 +1,60 @@
+<nav class="navbar">
+  <a class="nav-brand" routerLink="/">
+    <div class="brand-icon">
+      <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="1" y="5" width="26" height="18" rx="2" stroke="#4dd9ac" stroke-width="1.5"/>
+        <rect x="1" y="8" width="4" height="3" fill="#4dd9ac" opacity="0.7"/>
+        <rect x="1" y="17" width="4" height="3" fill="#4dd9ac" opacity="0.7"/>
+        <rect x="23" y="8" width="4" height="3" fill="#4dd9ac" opacity="0.7"/>
+        <rect x="23" y="17" width="4" height="3" fill="#4dd9ac" opacity="0.7"/>
+        <path d="M11 10.5L19 14L11 17.5V10.5Z" fill="#4dd9ac"/>
+      </svg>
+    </div>
+    <span class="brand-name">Movie<span class="brand-accent">Cutter</span></span>
+  </a>
+
+  <nav class="nav-links" aria-label="Nawigacja główna">
+    <a
+      class="nav-link"
+      routerLink="/"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      aria-label="Strona główna"
+    >
+      <i class="pi pi-home" aria-hidden="true"></i>
+      <span>Strona główna</span>
+    </a>
+
+    <div class="nav-divider" role="separator"></div>
+
+    <a
+      class="nav-link"
+      routerLink="/profil"
+      routerLinkActive="active"
+      aria-label="Zarządzaj profilami"
+    >
+      <i class="pi pi-users" aria-hidden="true"></i>
+      <span>Profile</span>
+    </a>
+
+    <a
+      class="nav-link"
+      routerLink="/pobieranie"
+      routerLinkActive="active"
+      aria-label="Pobieranie filmów"
+    >
+      <i class="pi pi-download" aria-hidden="true"></i>
+      <span>Pobieranie</span>
+    </a>
+
+    <a
+      class="nav-link"
+      routerLink="/edytor"
+      routerLinkActive="active"
+      aria-label="Edytor wideo"
+    >
+      <i class="pi pi-video" aria-hidden="true"></i>
+      <span>Edytor</span>
+    </a>
+  </nav>
+</nav>

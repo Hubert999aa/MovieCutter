@@ -1,8 +1,8 @@
-﻿using Application.Mediator;
-using Domain.TechnicalModels;
+﻿using Domain.TechnicalModels;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using MyMediator;
 
 namespace Application
 {

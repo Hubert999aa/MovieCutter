@@ -1,6 +1,6 @@
 ﻿using Application.Interfaces;
-using Application.Mediator;
-using Domain.TechnicalModels;
+using MyMediator.Interfaces;
+using CoreModels.TechnicalModels;
 using Serilog;
 
 namespace Application.Functions.Maintenance.ApplyDatabaseMigrationsCommand

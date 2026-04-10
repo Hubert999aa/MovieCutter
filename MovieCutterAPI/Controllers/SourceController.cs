@@ -3,7 +3,7 @@ using Application.Functions.MovieCutter.Source.Commands.DeleteSourceCommand;
 using Application.Functions.MovieCutter.Source.Commands.UpdateSourceCommand;
 using Application.Functions.MovieCutter.Source.Queries.GetSourceLastVideosQuery;
 using Application.Functions.MovieCutter.Source.Queries.GetSourcesListQuery;
-using Application.Mediator;
+using MyMediator.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MovieCutterAPI.Controllers

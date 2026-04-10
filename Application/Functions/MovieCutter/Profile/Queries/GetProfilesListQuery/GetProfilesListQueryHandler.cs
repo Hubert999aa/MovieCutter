@@ -1,6 +1,6 @@
 ﻿using Application.Interfaces;
-using Application.Mediator;
-using Domain.TechnicalModels;
+using MyMediator.Interfaces;
+using CoreModels.TechnicalModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Functions.MovieCutter.Profile.Queries.GetProfilesListQuery
@@ -14,6 +14,10 @@ namespace Application.Functions.MovieCutter.Profile.Queries.GetProfilesListQuery
                 {
                     p.IdProfile,
                     p.Name,
+                    Sources = p.Sources
+                        .Select(x => x.SourceType.ToString())
+                        .OrderBy(x => x)
+                        .ToList(),
                 })
                 .ToListAsync();
 

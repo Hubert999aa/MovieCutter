@@ -1,7 +1,8 @@
-﻿using Application.Mediator;
+﻿using MyMediator.Interfaces;
 using Domain.BusinessModels;
-using Domain.TechnicalModels;
+using CoreModels.TechnicalModels;
 using Microsoft.Extensions.Options;
+using Domain.TechnicalModels;
 
 namespace Application.Functions.MovieCutter.Files.Queries.GetVideoListFromDiskQuery
 {
