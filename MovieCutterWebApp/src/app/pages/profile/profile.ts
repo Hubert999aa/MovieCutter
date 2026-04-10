@@ -10,6 +10,7 @@ import { sourcesConfig } from '@shared/static-data/sources-config';
 import { Profile } from '@shared/models/profile';
 import { getAvatarColor, getInitials } from '@shared/helpers/avatar.helper';
 import { LoaderComponent } from '@shared/components/loader/loader';
+import { ToastService } from '@shared/services/toast/toast.service';
 
 @Component({
   selector: 'app-profile',
@@ -21,6 +22,7 @@ import { LoaderComponent } from '@shared/components/loader/loader';
 export class ProfileComponent implements OnInit {
   private readonly router  = inject(Router);
   private readonly profileService = inject(ProfileService);
+  private readonly toast = inject(ToastService);
   readonly platformConfig = sourcesConfig;
   readonly getAvatarColor = getAvatarColor;
   readonly getInitials = getInitials;
@@ -45,9 +47,9 @@ export class ProfileComponent implements OnInit {
         this.profiles.set(data);
         this.profilesLoading.set(false);
       },
-      error: () => {
+      error: err => {
         this.profilesLoading.set(false);
-        // TODO: pokazać komunikat błędu
+        this.toast.error(err);
       },
     });
   }
@@ -68,8 +70,8 @@ export class ProfileComponent implements OnInit {
           state: { profileName },
         });
       },
-      error: () => {
-        // TODO: pokazać komunikat błędu
+      error: err => {
+        this.toast.error(err);
       },
     });
   }
@@ -94,8 +96,8 @@ export class ProfileComponent implements OnInit {
         this.pendingDeleteId.set(null);
         this.loadProfiles();
       },
-      error: () => {
-        // TODO: pokazać komunikat błędu
+      error: err => {
+        this.toast.error(err);
         this.pendingDeleteId.set(null);
       },
     });
