@@ -7,10 +7,6 @@ export const routes: Routes = [
   },
   {
     path: 'pobieranie',
-    loadComponent: () => import('./pages/download/download').then(m => m.DownloadComponent),
-  },
-  {
-    path: 'pobieranie/nowe',
     loadComponent: () => import('./pages/request-download/request-download').then(m => m.RequestDownloadComponent),
   },
   {

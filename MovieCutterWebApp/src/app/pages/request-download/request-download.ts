@@ -146,7 +146,7 @@ export class RequestDownloadComponent implements OnInit {
     if (this.urlControl.invalid) return;
     this.videoProcessingService.requestVideoDownload(this.urlControl.value).subscribe({
       next: () => {
-        this.router.navigate(['/pobieranie']);
+        this.router.navigate(['/']);
       },
       error: err => {
         this.toast.error(err);
@@ -160,7 +160,7 @@ export class RequestDownloadComponent implements OnInit {
     if (!video || !source) return;
     this.videoProcessingService.requestVideoDownload(video.url).subscribe({
       next: () => {
-        this.router.navigate(['/pobieranie']);
+        this.router.navigate(['/']);
       },
       error: err => {
         this.toast.error(err);

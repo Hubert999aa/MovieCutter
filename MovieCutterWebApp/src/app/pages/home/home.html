@@ -19,7 +19,7 @@
   </div>
 
   <!-- Hero -->
-  <main class="hero">
+  <main class="hero" aria-label="Strona główna">
     <div class="hero__badge">
       <span class="badge__dot" aria-hidden="true"></span>
       <span>Narzędzie do obróbki wideo</span>
@@ -81,5 +81,12 @@
       </div>
     </div>
   </main>
+
+  <!-- Dashboard -->
+  <section class="dashboard" aria-label="Panel zadań">
+    <div class="dashboard__inner">
+      <app-task-queue />
+    </div>
+  </section>
 
 </div>

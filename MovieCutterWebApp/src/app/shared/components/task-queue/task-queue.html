@@ -1,0 +1,76 @@
+<div class="tq">
+
+  <!-- Header -->
+  <div class="tq__header">
+    <div class="tq__title-group">
+      <h2 class="tq__title">Kolejka zadań</h2>
+      @if (activeCount() > 0) {
+        <span class="tq__badge" aria-label="{{ activeCount() }} aktywnych zadań">
+          <span class="tq__badge-dot" aria-hidden="true"></span>
+          {{ activeCount() }}
+        </span>
+      }
+    </div>
+  </div>
+
+  <!-- Task list -->
+  @if (tasks().length > 0) {
+    <ul class="tq__list" aria-label="Lista zadań">
+      @for (task of tasks(); track task.id) {
+        <li
+          class="tq__item"
+          [attr.data-status]="task.status"
+          [attr.aria-label]="typeConfig[task.type].label + ': ' + task.name + ', status: ' + statusConfig[task.status].label"
+        >
+
+          <!-- Type icon -->
+          <div class="tq__type-icon" aria-hidden="true">
+            <i [class]="typeConfig[task.type].icon"></i>
+          </div>
+
+          <!-- Info -->
+          <div class="tq__info">
+            <span class="tq__name">{{ task.name }}</span>
+            <span class="tq__type-label">{{ typeConfig[task.type].label }}</span>
+
+            <!-- Progress bar (only when processing) -->
+            @if (task.status === 'processing' && task.progress !== undefined) {
+              <div
+                class="tq__progress"
+                role="progressbar"
+                [attr.aria-valuenow]="task.progress"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                [attr.aria-label]="'Postęp: ' + task.progress + '%'"
+              >
+                <div class="tq__progress-track">
+                  <div
+                    class="tq__progress-fill"
+                    [style.width.%]="task.progress"
+                  ></div>
+                </div>
+                <span class="tq__progress-pct" aria-hidden="true">{{ task.progress }}%</span>
+              </div>
+            }
+          </div>
+
+          <!-- Status badge -->
+          <div class="tq__status" [attr.data-status]="task.status" aria-hidden="true">
+            <i [class]="statusConfig[task.status].icon"></i>
+            <span>{{ statusConfig[task.status].label }}</span>
+          </div>
+
+        </li>
+      }
+    </ul>
+  } @else {
+    <!-- Empty state -->
+    <div class="tq__empty" role="status">
+      <div class="tq__empty-icon" aria-hidden="true">
+        <i class="pi pi-inbox"></i>
+      </div>
+      <p class="tq__empty-text">Brak aktywnych zadań</p>
+    </div>
+  }
+
+</div>
