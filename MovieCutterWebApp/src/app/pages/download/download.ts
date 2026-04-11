@@ -1,8 +1,10 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { ButtonModule } from 'primeng/button';
 
 @Component({
   selector: 'app-download',
-  imports: [],
+  imports: [RouterLink, ButtonModule],
   templateUrl: './download.html',
   styleUrl: './download.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -1,7 +1,44 @@
-<div class="page-stub">
-  <div class="stub-icon" aria-hidden="true">
-    <i class="pi pi-download"></i>
+<div class="download-page">
+
+  <!-- Background layers -->
+  <div class="bg-grid" aria-hidden="true"></div>
+  <div class="bg-glow bg-glow--left" aria-hidden="true"></div>
+  <div class="bg-glow bg-glow--right" aria-hidden="true"></div>
+
+  <div class="page-content">
+
+    <!-- Page header -->
+    <header class="page-header">
+      <div class="header-main">
+        <div>
+          <h1 class="page-title">Pobieranie</h1>
+          <p class="page-subtitle">Kolejka pobrań i ich aktualny postęp.</p>
+        </div>
+        <a routerLink="/pobieranie/nowe" class="new-download-btn" aria-label="Zaplanuj nowe pobieranie">
+          <i class="pi pi-plus" aria-hidden="true"></i>
+          Nowe pobieranie
+        </a>
+      </div>
+    </header>
+
+    <!-- Empty queue placeholder -->
+    <div class="queue-empty" role="status" aria-label="Brak aktywnych pobrań">
+      <div class="queue-empty__icon" aria-hidden="true">
+        <i class="pi pi-inbox"></i>
+      </div>
+      <h2 class="queue-empty__title">Brak aktywnych pobrań</h2>
+      <p class="queue-empty__desc">
+        Kolejka jest pusta. Zaplanuj nowe pobieranie, aby zobaczyć tutaj jego postęp.
+      </p>
+      <a
+        routerLink="/pobieranie/nowe"
+        class="queue-empty__cta"
+        aria-label="Zaplanuj pierwsze pobieranie"
+      >
+        <i class="pi pi-download" aria-hidden="true"></i>
+        Zaplanuj pobieranie
+      </a>
+    </div>
+
   </div>
-  <h1 class="stub-title">Pobieranie</h1>
-  <p class="stub-desc">Strona w budowie. Wkrótce będziesz mógł pobierać filmy bezpośrednio tutaj.</p>
 </div>

@@ -10,6 +10,10 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/download/download').then(m => m.DownloadComponent),
   },
   {
+    path: 'pobieranie/nowe',
+    loadComponent: () => import('./pages/request-download/request-download').then(m => m.RequestDownloadComponent),
+  },
+  {
     path: 'edytor',
     loadComponent: () => import('./pages/cutting/cutting').then(m => m.CuttingComponent),
   },
