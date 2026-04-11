@@ -14,7 +14,7 @@ namespace JobsRunner.Consumers
             var startInfo = new ProcessStartInfo
             {
                 FileName = "yt-dlp",
-                Arguments = context.Message.Url,
+                Arguments = $"-o \"%(id)s.%(ext)s\" {context.Message.Url}",
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
