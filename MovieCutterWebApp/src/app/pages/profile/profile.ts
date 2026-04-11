@@ -5,7 +5,7 @@ import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 
-import { ProfileService } from '@shared/services/profiles/profile.services';
+import { ProfileService } from '@src/app/shared/services/profile/profile.services';
 import { sourcesConfig } from '@shared/static-data/sources-config';
 import { Profile } from '@shared/models/profile';
 import { getAvatarColor, getInitials } from '@shared/helpers/avatar.helper';
