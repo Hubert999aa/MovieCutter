@@ -10,7 +10,7 @@ import { ProfileSourceType } from '@shared/enums/profile-source-type';
 import { sourcesConfig } from '@shared/static-data/sources-config';
 import { profileSourceTypeToSourceType } from '@shared/static-data/source-type-mapping';
 import { ProfileSource } from '@shared/models/profile-source';
-import { ProfileService } from '@src/app/shared/services/profile/profile.services';
+import { ProfileService } from '@src/app/shared/services/profile/profile.service';
 import { SourceService } from '@src/app/shared/services/source/source.service';
 import { getAvatarColor, getInitials } from '@shared/helpers/avatar.helper';
 import { LoaderComponent } from '@shared/components/loader/loader';

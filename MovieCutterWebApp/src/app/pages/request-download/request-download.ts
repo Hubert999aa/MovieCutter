@@ -7,7 +7,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { Profile } from '@shared/models/profile';
 import { ProfileSource } from '@shared/models/profile-source';
 import { Video } from '@shared/models/video';
-import { ProfileService } from '@src/app/shared/services/profile/profile.services';
+import { ProfileService } from '@src/app/shared/services/profile/profile.service';
 import { SourceService } from '@src/app/shared/services/source/source.service';
 import { ToastService } from '@shared/services/toast/toast.service';
 import { VideoProcessingService } from '@shared/services/video-processing/video-processing.service';
