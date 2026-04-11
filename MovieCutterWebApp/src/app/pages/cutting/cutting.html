@@ -1,7 +1,242 @@
-<div class="page-stub">
-  <div class="stub-icon" aria-hidden="true">
-    <i class="pi pi-video"></i>
+<div class="cutting-page">
+
+  <!-- Background layers -->
+  <div class="bg-grid" aria-hidden="true"></div>
+  <div class="bg-glow bg-glow--left" aria-hidden="true"></div>
+  <div class="bg-glow bg-glow--right" aria-hidden="true"></div>
+
+  <div class="page-content">
+
+    <!-- Page header -->
+    <header class="page-header">
+      <h1 class="page-title">Edytor</h1>
+      <p class="page-subtitle">Wybierz plik i zdecyduj jak chcesz go przetworzyć.</p>
+    </header>
+
+    <!-- ── Step 1: Wybierz plik ──────────────────────────────────────────────── -->
+    <section class="step-section" aria-labelledby="step1-title">
+      <div class="step-header">
+        <div class="step-number" aria-hidden="true">1</div>
+        <h2 id="step1-title" class="step-title">Wybierz plik</h2>
+      </div>
+
+      @if (!selectedFile()) {
+        @if (filesLoading()) {
+          <app-loader variant="rows" [count]="4" />
+        } @else if (files().length === 0) {
+          <div class="empty-inline" role="status">
+            <i class="pi pi-folder-open" aria-hidden="true"></i>
+            <span>Brak dostępnych plików wideo na serwerze.</span>
+          </div>
+        } @else {
+          <ul class="file-list" aria-label="Dostępne pliki wideo">
+            @for (file of files(); track file.fullPath) {
+              <li>
+                <button
+                  class="file-card"
+                  type="button"
+                  (click)="selectFile(file)"
+                  [attr.aria-label]="'Wybierz plik ' + file.name"
+                >
+                  <div class="file-icon" aria-hidden="true">
+                    <i class="pi pi-file-video"></i>
+                  </div>
+                  <div class="file-info">
+                    <span class="file-name">{{ file.name }}</span>
+                    <span class="file-path">{{ file.fullPath }}</span>
+                  </div>
+                  <i class="pi pi-angle-right file-arrow" aria-hidden="true"></i>
+                </button>
+              </li>
+            }
+          </ul>
+        }
+      } @else {
+        <!-- Selected file bar -->
+        <div class="selected-bar" aria-live="polite">
+          <div class="selected-icon" aria-hidden="true">
+            <i class="pi pi-file-video"></i>
+          </div>
+          <div class="selected-info">
+            <span class="selected-name">{{ selectedFile()!.name }}</span>
+            <span class="selected-sub">{{ selectedFile()!.fullPath }}</span>
+          </div>
+          <button
+            class="change-btn"
+            type="button"
+            (click)="changeFile()"
+            aria-label="Zmień wybrany plik"
+          >
+            <i class="pi pi-refresh" aria-hidden="true"></i>
+            Zmień
+          </button>
+        </div>
+      }
+    </section>
+
+    <!-- ── Step 2: Tryb przetwarzania ────────────────────────────────────────── -->
+    @if (selectedFile()) {
+      <section class="step-section" aria-labelledby="step2-title">
+        <div class="step-header">
+          <div class="step-number" aria-hidden="true">2</div>
+          <h2 id="step2-title" class="step-title">Tryb przetwarzania</h2>
+        </div>
+
+        <div class="mode-tabs" role="tablist" aria-label="Wybierz tryb przetwarzania">
+          <button
+            class="mode-tab"
+            [class.mode-tab--active]="mode() === 'frames'"
+            role="tab"
+            [attr.aria-selected]="mode() === 'frames'"
+            (click)="setMode('frames')"
+          >
+            <i class="pi pi-th-large" aria-hidden="true"></i>
+            Klatki
+          </button>
+          <button
+            class="mode-tab"
+            [class.mode-tab--active]="mode() === 'pieces'"
+            role="tab"
+            [attr.aria-selected]="mode() === 'pieces'"
+            (click)="setMode('pieces')"
+          >
+            <i class="pi pi-scissors" aria-hidden="true"></i>
+            Kawałki
+          </button>
+        </div>
+
+        @if (mode() === 'frames') {
+          <div class="mode-info" role="note">
+            <i class="pi pi-info-circle" aria-hidden="true"></i>
+            <span>Plik zostanie podzielony na pojedyncze klatki i zapisany jako zestaw obrazów.</span>
+          </div>
+        } @else {
+          <div class="mode-info" role="note">
+            <i class="pi pi-info-circle" aria-hidden="true"></i>
+            <span>Zdefiniuj zakres czasowy każdego kawałka. Wymagany format: <code>HH:MM:SS</code></span>
+          </div>
+        }
+      </section>
+
+      <!-- ── Step 3: Kawałki ─────────────────────────────────────────────────── -->
+      @if (mode() === 'pieces') {
+        <section class="step-section" aria-labelledby="step3-title">
+          <div class="step-header">
+            <div class="step-number" aria-hidden="true">3</div>
+            <h2 id="step3-title" class="step-title">Zdefiniuj kawałki</h2>
+          </div>
+
+          <form [formGroup]="form" class="pieces-form">
+            <div formArrayName="pieces" class="pieces-list">
+              @for (piece of piecesArray.controls; track $index) {
+                <div
+                  class="piece-row"
+                  [formGroupName]="$index"
+                  role="group"
+                  [attr.aria-label]="'Kawałek ' + ($index + 1)"
+                >
+                  <span class="piece-index" aria-hidden="true">{{ $index + 1 }}</span>
+
+                  <div class="piece-field">
+                    <label class="time-label" [for]="'start-' + $index">Od</label>
+                    <input
+                      [id]="'start-' + $index"
+                      type="text"
+                      class="time-input"
+                      [class.time-input--error]="piece.get('startTime')!.invalid && piece.get('startTime')!.touched"
+                      formControlName="startTime"
+                      placeholder="00:00:00"
+                      maxlength="8"
+                      aria-required="true"
+                    />
+                    @if (piece.get('startTime')!.invalid && piece.get('startTime')!.touched) {
+                      <span class="time-error" role="alert">Wymagany format HH:MM:SS</span>
+                    }
+                  </div>
+
+                  <div class="piece-separator" aria-hidden="true">
+                    <i class="pi pi-arrow-right"></i>
+                  </div>
+
+                  <div class="piece-field">
+                    <label class="time-label" [for]="'end-' + $index">Do</label>
+                    <input
+                      [id]="'end-' + $index"
+                      type="text"
+                      class="time-input"
+                      [class.time-input--error]="piece.get('endTime')!.invalid && piece.get('endTime')!.touched"
+                      formControlName="endTime"
+                      placeholder="00:00:00"
+                      maxlength="8"
+                      aria-required="true"
+                    />
+                    @if (piece.get('endTime')!.invalid && piece.get('endTime')!.touched) {
+                      <span class="time-error" role="alert">Wymagany format HH:MM:SS</span>
+                    }
+                  </div>
+
+                  @if (piecesArray.length > 1) {
+                    <button
+                      class="remove-btn"
+                      type="button"
+                      (click)="removePiece($index)"
+                      [attr.aria-label]="'Usuń kawałek ' + ($index + 1)"
+                    >
+                      <i class="pi pi-trash" aria-hidden="true"></i>
+                    </button>
+                  } @else {
+                    <div class="remove-btn-placeholder" aria-hidden="true"></div>
+                  }
+                </div>
+              }
+            </div>
+          </form>
+
+          <button
+            class="add-piece-btn"
+            type="button"
+            (click)="addPiece()"
+            aria-label="Dodaj kolejny kawałek"
+          >
+            <i class="pi pi-plus" aria-hidden="true"></i>
+            Dodaj kawałek
+          </button>
+        </section>
+      }
+
+      <!-- ── Submit bar ─────────────────────────────────────────────────────── -->
+      @if (canSubmit()) {
+        <div
+          class="submit-bar"
+          role="region"
+          aria-label="Podsumowanie operacji"
+          aria-live="polite"
+        >
+          <div class="submit-info">
+            @if (mode() === 'frames') {
+              <i class="pi pi-th-large" aria-hidden="true"></i>
+              <span class="submit-text">
+                Podział na klatki: <strong>{{ selectedFile()!.name }}</strong>
+              </span>
+            } @else {
+              <i class="pi pi-scissors" aria-hidden="true"></i>
+              <span class="submit-text">
+                Wycinanie <strong>{{ piecesArray.length }} kawałka(ów)</strong>
+                z <strong>{{ selectedFile()!.name }}</strong>
+              </span>
+            }
+          </div>
+          <p-button
+            label="Uruchom"
+            icon="pi pi-play"
+            [loading]="submitting()"
+            [disabled]="submitting()"
+            (onClick)="submit()"
+            aria-label="Uruchom przetwarzanie wideo"
+          />
+        </div>
+      }
+    }
+
   </div>
-  <h1 class="stub-title">Edytor</h1>
-  <p class="stub-desc">Strona w budowie. Wkrótce będziesz mógł przycinać i edytować swoje filmy tutaj.</p>
 </div>
