@@ -3,6 +3,7 @@ import { Observable } from 'rxjs';
 
 import { VideoProcessingApi } from '@shared/services/video-processing/video-processing.api';
 import { VideoCuttingIntoPicesRequest } from '@shared/models/api-models/video-processing/video-cuttting-into-pices.request';
+import { DownloadAndCutVideoRequest } from '@shared/models/api-models/video-processing/download-and-cut-video.request';
 
 @Injectable({ providedIn: 'root' })
 export class VideoProcessingService {
@@ -18,5 +19,9 @@ export class VideoProcessingService {
   
   requestVideoCuttingIntoFrames(sourceVideoFullPath: string): Observable<Object> {
     return this.videoProcessingApi.requestVideoCuttingIntoFrames(sourceVideoFullPath);
+  }
+
+  requestDownloadAndCutVideo(request: DownloadAndCutVideoRequest): Observable<Object> {
+    return this.videoProcessingApi.requestDownloadAndCutVideo(request);
   }
 }
