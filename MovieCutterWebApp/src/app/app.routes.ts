@@ -7,7 +7,7 @@ export const routes: Routes = [
   },
   {
     path: 'pobieranie',
-    loadComponent: () => import('./pages/download/download').then(m => m.DownloadComponent),
+    loadComponent: () => import('./pages/request-download/request-download').then(m => m.RequestDownloadComponent),
   },
   {
     path: 'edytor',

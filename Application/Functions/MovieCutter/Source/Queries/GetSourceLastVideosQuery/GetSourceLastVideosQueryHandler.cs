@@ -12,7 +12,7 @@ namespace Application.Functions.MovieCutter.Source.Queries.GetSourceLastVideosQu
 {
     public class GetSourceLastVideosQueryHandler(IMovieCutterDatabase _context) : IRequestHandler<GetSourceLastVideosQuery, BaseResponse>
     {
-        private const int videosLimit = 15;
+        private const int videosLimit = 5;
 
         public async Task<BaseResponse> Handle(GetSourceLastVideosQuery request, CancellationToken cancellationToken)
         {

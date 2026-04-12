@@ -10,10 +10,11 @@ import { ProfileSourceType } from '@shared/enums/profile-source-type';
 import { sourcesConfig } from '@shared/static-data/sources-config';
 import { profileSourceTypeToSourceType } from '@shared/static-data/source-type-mapping';
 import { ProfileSource } from '@shared/models/profile-source';
-import { ProfileService } from '@shared/services/profiles/profile.services';
-import { SourceService } from '@shared/services/sources/source.service';
+import { ProfileService } from '@src/app/shared/services/profile/profile.service';
+import { SourceService } from '@src/app/shared/services/source/source.service';
 import { getAvatarColor, getInitials } from '@shared/helpers/avatar.helper';
 import { LoaderComponent } from '@shared/components/loader/loader';
+import { ToastService } from '@shared/services/toast/toast.service';
 
 interface SourceTypeOption {
   label: string;
@@ -33,6 +34,7 @@ export class ProfileEditComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly profileService = inject(ProfileService);
   private readonly sourceService = inject(SourceService);
+  private readonly toast = inject(ToastService);
 
   private readonly idProfile = Number(inject(ActivatedRoute).snapshot.paramMap.get('id'));
   private readonly profileName = (history.state as Record<string, unknown>)['profileName'] as string | undefined;
@@ -84,9 +86,9 @@ export class ProfileEditComponent implements OnInit {
         this.sources.set(sources);
         this.sourcesLoading.set(false);
       },
-      error: () => {
+      error: err => {
         this.sourcesLoading.set(false);
-        // TODO: pokazać komunikat błędu
+        this.toast.error(err);
       },
     });
   }
@@ -118,19 +120,19 @@ export class ProfileEditComponent implements OnInit {
             this.loadSources();
             this.dialogVisible.set(false);
           },
-          error: () => {
-          // TODO: pokazać komunikat błędu
+          error: err => {
+            this.toast.error(err);
           },
         });
     } else {
       this.sourceService.createSource({ idProfile: this.idProfile, name, baseUrl, sourceType })
         .subscribe({
-          next: created => {
+          next: () => {
             this.loadSources();
             this.dialogVisible.set(false);
           },
-          error: () => {
-          // TODO: pokazać komunikat błędu
+          error: err => {
+            this.toast.error(err);
           },
         });
     }
@@ -151,7 +153,10 @@ export class ProfileEditComponent implements OnInit {
           this.loadSources()
           this.pendingDeleteId.set(null);
         },
-        error: () => this.pendingDeleteId.set(null),
+        error: err => {
+          this.toast.error(err);
+          this.pendingDeleteId.set(null);
+        },
       });
   }
 
@@ -162,8 +167,8 @@ export class ProfileEditComponent implements OnInit {
       next: () => {
         this.loadSources();
       },
-      error: () => {
-      // TODO: pokazać komunikat błędu
+      error: err => {
+        this.toast.error(err);
       },
     });
   }

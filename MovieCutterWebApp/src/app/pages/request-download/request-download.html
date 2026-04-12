@@ -1,0 +1,323 @@
+<div class="request-page">
+
+  <!-- Background layers -->
+  <div class="bg-grid" aria-hidden="true"></div>
+  <div class="bg-glow bg-glow--left" aria-hidden="true"></div>
+  <div class="bg-glow bg-glow--right" aria-hidden="true"></div>
+
+  <div class="page-content">
+
+    <!-- Page header -->
+    <header class="page-header">
+      <h1 class="page-title">Pobieranie</h1>
+      <p class="page-subtitle">Wybierz sposób wskazania wideo do pobrania.</p>
+    </header>
+
+    <!-- Mode tabs -->
+    <div class="mode-tabs" role="tablist" aria-label="Tryb pobierania">
+      <button
+        class="mode-tab"
+        [class.mode-tab--active]="mode() === 'link'"
+        role="tab"
+        [attr.aria-selected]="mode() === 'link'"
+        (click)="setMode('link')"
+      >
+        <i class="pi pi-link" aria-hidden="true"></i>
+        Bezpośredni link
+      </button>
+      <button
+        class="mode-tab"
+        [class.mode-tab--active]="mode() === 'profile'"
+        role="tab"
+        [attr.aria-selected]="mode() === 'profile'"
+        (click)="setMode('profile')"
+      >
+        <i class="pi pi-user" aria-hidden="true"></i>
+        Z profilu
+      </button>
+    </div>
+
+    <!-- ─────────────────────────────────────────────────────────────────── -->
+    <!-- LINK MODE                                                            -->
+    <!-- ─────────────────────────────────────────────────────────────────── -->
+    @if (mode() === 'link') {
+      <section class="link-section" aria-labelledby="link-section-title">
+        <h2 id="link-section-title" class="section-label">Wklej link do wideo</h2>
+        <div class="link-row">
+          <div class="link-input-wrap">
+            <i class="pi pi-link link-prefix-icon" aria-hidden="true"></i>
+            <input
+              type="url"
+              pInputText
+              class="link-input"
+              placeholder="https://www.youtube.com/watch?v=..."
+              [formControl]="urlControl"
+              autocomplete="off"
+              aria-label="Link do wideo"
+              (keydown.enter)="submitLink()"
+            />
+          </div>
+          <p-button
+            label="Zaplanuj pobieranie"
+            icon="pi pi-download"
+            (onClick)="submitLink()"
+            aria-label="Zaplanuj pobieranie z podanego linku"
+          />
+        </div>
+      </section>
+    }
+
+    <!-- ─────────────────────────────────────────────────────────────────── -->
+    <!-- PROFILE MODE                                                         -->
+    <!-- ─────────────────────────────────────────────────────────────────── -->
+    @if (mode() === 'profile') {
+
+      <!-- Step 1 ── Profil ──────────────────────────────────────────────── -->
+      <section class="step-section" aria-labelledby="step1-title">
+        <div class="step-header">
+          <div class="step-number" aria-hidden="true">1</div>
+          <h2 id="step1-title" class="step-title">Wybierz profil</h2>
+        </div>
+
+        @if (!selectedProfile()) {
+          @if (profilesLoading()) {
+            <app-loader variant="cards" [count]="4" />
+          } @else if (profiles().length === 0) {
+            <div class="empty-inline" role="status">
+              <i class="pi pi-users" aria-hidden="true"></i>
+              <span>Brak profili. <a routerLink="/profil" class="inline-link">Utwórz profil</a>, aby kontynuować.</span>
+            </div>
+          } @else {
+            <ul class="profile-pick-grid" aria-label="Wybierz profil">
+              @for (profile of profiles(); track profile.idProfile) {
+                <li>
+                  <button
+                    class="profile-pick-card"
+                    type="button"
+                    (click)="selectProfile(profile)"
+                    [attr.aria-label]="'Wybierz profil ' + profile.name"
+                  >
+                    <div
+                      class="pick-avatar"
+                      [style.background]="getAvatarColor(profile.name) + '1a'"
+                      [style.border-color]="getAvatarColor(profile.name) + '40'"
+                      [style.color]="getAvatarColor(profile.name)"
+                      aria-hidden="true"
+                    >{{ getInitials(profile.name) }}</div>
+
+                    <div class="pick-info">
+                      <span class="pick-name">{{ profile.name }}</span>
+                      @if (profile.sources.length > 0) {
+                        <div class="pick-badges" aria-hidden="true">
+                          @for (src of profile.sources; track src) {
+                            <span
+                              class="source-badge"
+                              [style.--badge-color]="platformConfig[src].color"
+                              [title]="platformConfig[src].label"
+                            >
+                              @if (platformConfig[src].icon) {
+                                <i [class]="platformConfig[src].icon"></i>
+                              } @else {
+                                <span class="source-badge__text">TT</span>
+                              }
+                            </span>
+                          }
+                        </div>
+                      } @else {
+                        <span class="pick-no-sources">Brak źródeł</span>
+                      }
+                    </div>
+
+                    <i class="pi pi-angle-right pick-arrow" aria-hidden="true"></i>
+                  </button>
+                </li>
+              }
+            </ul>
+          }
+        } @else {
+          <!-- Selected profile bar -->
+          <div class="selected-bar">
+            <div
+              class="selected-avatar"
+              [style.background]="getAvatarColor(selectedProfile()!.name) + '1a'"
+              [style.border-color]="getAvatarColor(selectedProfile()!.name) + '40'"
+              [style.color]="getAvatarColor(selectedProfile()!.name)"
+              aria-hidden="true"
+            >{{ getInitials(selectedProfile()!.name) }}</div>
+            <span class="selected-name">{{ selectedProfile()!.name }}</span>
+            <button
+              class="change-btn"
+              type="button"
+              (click)="changeProfile()"
+              aria-label="Zmień wybrany profil"
+            >
+              <i class="pi pi-refresh" aria-hidden="true"></i>
+              Zmień profil
+            </button>
+          </div>
+        }
+      </section>
+
+      <!-- Step 2 ── Źródło ─────────────────────────────────────────────── -->
+      @if (selectedProfile()) {
+        <section class="step-section" aria-labelledby="step2-title">
+          <div class="step-header">
+            <div class="step-number" aria-hidden="true">2</div>
+            <h2 id="step2-title" class="step-title">Wybierz źródło</h2>
+          </div>
+
+          @if (!selectedSource()) {
+            @if (sourcesLoading()) {
+              <app-loader variant="rows" [count]="3" />
+            } @else if (sources().length === 0) {
+              <div class="empty-inline" role="status">
+                <i class="pi pi-link" aria-hidden="true"></i>
+                <span>Ten profil nie ma przypisanych źródeł.</span>
+              </div>
+            } @else {
+              <ul class="source-pick-list" aria-label="Wybierz źródło">
+                @for (source of sources(); track source.id) {
+                  <li>
+                    <button
+                      class="source-pick-card"
+                      type="button"
+                      [style.--source-color]="platformConfig[source.type].color"
+                      (click)="selectSource(source)"
+                      [attr.aria-label]="'Wybierz źródło ' + source.name"
+                    >
+                      <div class="source-pick-icon" aria-hidden="true">
+                        @if (platformConfig[source.type].icon) {
+                          <i [class]="platformConfig[source.type].icon"></i>
+                        } @else {
+                          <span class="tt-text">TT</span>
+                        }
+                      </div>
+                      <div class="source-pick-info">
+                        <span class="source-pick-name">{{ source.name }}</span>
+                        <span class="source-pick-url">{{ source.baseUrl }}</span>
+                      </div>
+                      <span
+                        class="source-type-badge"
+                        [style.color]="platformConfig[source.type].color"
+                        [style.background]="platformConfig[source.type].color + '18'"
+                        [style.border-color]="platformConfig[source.type].color + '30'"
+                      >{{ platformConfig[source.type].label }}</span>
+                      <i class="pi pi-angle-right pick-arrow" aria-hidden="true"></i>
+                    </button>
+                  </li>
+                }
+              </ul>
+            }
+          } @else {
+            <!-- Selected source bar -->
+            <div class="selected-bar">
+              <div
+                class="selected-icon"
+                [style.background]="platformConfig[selectedSource()!.type].color + '1a'"
+                [style.border-color]="platformConfig[selectedSource()!.type].color + '40'"
+                [style.color]="platformConfig[selectedSource()!.type].color"
+                aria-hidden="true"
+              >
+                @if (platformConfig[selectedSource()!.type].icon) {
+                  <i [class]="platformConfig[selectedSource()!.type].icon"></i>
+                } @else {
+                  <span class="tt-text">TT</span>
+                }
+              </div>
+              <div class="selected-info">
+                <span class="selected-name">{{ selectedSource()!.name }}</span>
+                <span class="selected-sub">{{ platformConfig[selectedSource()!.type].label }}</span>
+              </div>
+              <button
+                class="change-btn"
+                type="button"
+                (click)="changeSource()"
+                aria-label="Zmień wybrane źródło"
+              >
+                <i class="pi pi-refresh" aria-hidden="true"></i>
+                Zmień
+              </button>
+            </div>
+          }
+        </section>
+      }
+
+      <!-- Step 3 ── Wideo ──────────────────────────────────────────────── -->
+      @if (selectedSource()) {
+        <section class="step-section" aria-labelledby="step3-title">
+          <div class="step-header">
+            <div class="step-number" aria-hidden="true">3</div>
+            <h2 id="step3-title" class="step-title">Wybierz wideo</h2>
+          </div>
+
+          @if (videosLoading()) {
+            <app-loader variant="rows" [count]="5" />
+          } @else if (videos().length === 0) {
+            <div class="empty-inline" role="status">
+              <i class="pi pi-video" aria-hidden="true"></i>
+              <span>Brak dostępnych wideo dla tego źródła.</span>
+            </div>
+          } @else {
+            <ul class="video-list" aria-label="Wybierz wideo do pobrania">
+              @for (video of videos(); track video.idVideo) {
+                <li>
+                  <button
+                    class="video-card"
+                    type="button"
+                    [class.video-card--selected]="selectedVideo()?.idVideo === video.idVideo"
+                    (click)="selectVideo(video)"
+                    [attr.aria-label]="'Wybierz wideo: ' + video.title"
+                    [attr.aria-pressed]="selectedVideo()?.idVideo === video.idVideo"
+                  >
+                    <div class="video-thumb" aria-hidden="true">
+                      <i class="pi pi-play-circle"></i>
+                    </div>
+                    <div class="video-info">
+                      <span class="video-title">{{ video.title }}</span>
+                      <a
+                        [href]="video.url"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="video-url"
+                        (click)="$event.stopPropagation()"
+                        [attr.aria-label]="'Otwórz ' + video.title + ' w nowej karcie'"
+                      >
+                        <i class="pi pi-external-link" aria-hidden="true"></i>
+                        {{ video.url }}
+                      </a>
+                    </div>
+                    <div class="video-check" aria-hidden="true">
+                      @if (selectedVideo()?.idVideo === video.idVideo) {
+                        <i class="pi pi-check-circle"></i>
+                      } @else {
+                        <i class="pi pi-circle"></i>
+                      }
+                    </div>
+                  </button>
+                </li>
+              }
+            </ul>
+          }
+        </section>
+      }
+
+      <!-- Submit bar ── pojawia się po wyborze wideo ───────────────────── -->
+      @if (selectedVideo()) {
+        <div class="submit-bar" role="region" aria-label="Podsumowanie pobierania" aria-live="polite">
+          <div class="submit-info">
+            <i class="pi pi-video" aria-hidden="true"></i>
+            <span class="submit-title">{{ selectedVideo()!.title }}</span>
+          </div>
+          <p-button
+            label="Zaplanuj pobieranie"
+            icon="pi pi-download"
+            (onClick)="submitProfile()"
+            aria-label="Zaplanuj pobieranie wybranego wideo"
+          />
+        </div>
+      }
+
+    }
+
+  </div>
+</div>
