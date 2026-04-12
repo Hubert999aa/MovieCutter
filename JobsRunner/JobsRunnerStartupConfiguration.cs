@@ -13,6 +13,7 @@ namespace JobsRunner
                 x.AddConsumer<DownloadVideoConsumer>();
                 x.AddConsumer<CutVideoIntoPicesConsumer>();
                 x.AddConsumer<CutVideoIntoFramesConsumer>();
+                x.AddConsumer<DownloadAndCutVideoConsumer>();
 
                 // RabbitMQ configuration
                 x.UsingRabbitMq((context, cfg) =>
@@ -54,6 +55,17 @@ namespace JobsRunner
                         ));
                         e.PrefetchCount = rabbitMqSettings.Queues.CutVideoIntoPicesSettings.PrefetchCount;
                         e.ConfigureConsumer<CutVideoIntoPicesConsumer>(context);
+                    });
+
+                    // Queue configuration for DownloadAndCutVideoConsumer
+                    cfg.ReceiveEndpoint(rabbitMqSettings.Queues.DownloadAndCutVideoSettings.Name, e =>
+                    {
+                        e.UseMessageRetry(r => r.Interval(
+                            rabbitMqSettings.Queues.DownloadAndCutVideoSettings.RetryCount,
+                            TimeSpan.FromSeconds(rabbitMqSettings.Queues.DownloadAndCutVideoSettings.RetryIntervalSeconds)
+                        ));
+                        e.PrefetchCount = rabbitMqSettings.Queues.DownloadAndCutVideoSettings.PrefetchCount;
+                        e.ConfigureConsumer<DownloadAndCutVideoConsumer>(context);
                     });
                 });
             });
