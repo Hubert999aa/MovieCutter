@@ -30,6 +30,7 @@ namespace JobsRunner.Consumers
 
         private async Task DownloadVideo(ConsumeContext<DownloadAndCutVideoMessage> context)
         {
+            logger.LogInformation("Download and cutting process - Download started");
             var downloadStartInfo = new ProcessStartInfo
             {
                 FileName = "yt-dlp",
@@ -41,7 +42,8 @@ namespace JobsRunner.Consumers
                 WorkingDirectory = context.Message.VideoOutputFolder,
             };
 
-            await ProcessRunner.RunProcess(downloadStartInfo, context.CancellationToken);
+            await ProcessRunner.RunProcess(downloadStartInfo, context.CancellationToken, true);
+            logger.LogInformation("Download and cutting process - Download finished");
         }
 
         private async Task<string> GetVideoNameWithExtension(ConsumeContext<DownloadAndCutVideoMessage> context)
@@ -77,6 +79,7 @@ namespace JobsRunner.Consumers
 
         private async Task CutVideoIntoPiciesAndFrames(ConsumeContext<DownloadAndCutVideoMessage> context, string sourceVideoNameWithExtension)
         {
+            logger.LogInformation("Download and cutting process - Cutting into pieces started");
             var videoNumber = 1;
             var sourceVideoNameWithExtensionArray = sourceVideoNameWithExtension.Split('.');
             var sourceVideoName = sourceVideoNameWithExtensionArray[0];
@@ -97,15 +100,17 @@ namespace JobsRunner.Consumers
                     CreateNoWindow = true,
                 };
 
-                await ProcessRunner.RunProcess(videoPiecesStartInfo, context.CancellationToken);
+                await ProcessRunner.RunProcess(videoPiecesStartInfo, context.CancellationToken, true);
                 await this.CutVideoIntoFrames(newVideoPath, newVideoNameWithoutExtension, context);
 
                 videoNumber++;
+                logger.LogInformation("Download and cutting process - Cutting into pieces finished");
             }
         }
 
         private async Task CutVideoIntoFrames(string newVideoPath, string newVideoNameWithoutExtension, ConsumeContext<DownloadAndCutVideoMessage> context)
         {
+            logger.LogInformation("Download and cutting process - Cutting into frames started");
             var videoFramesFolderPath = Path.Combine(context.Message.FramesOutputFolder, newVideoNameWithoutExtension);
             Directory.CreateDirectory(videoFramesFolderPath);
 
@@ -119,7 +124,8 @@ namespace JobsRunner.Consumers
                 CreateNoWindow = true,
             };
 
-            await ProcessRunner.RunProcess(videoFramesStartInfo, context.CancellationToken);
+            await ProcessRunner.RunProcess(videoFramesStartInfo, context.CancellationToken, true);
+            logger.LogInformation("Download and cutting process - Cutting into frames finished");
         }
     }
 }

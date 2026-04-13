@@ -10,4 +10,8 @@
   <Folder Name="/Presentation/">
     <Project Path="MovieCutterAPI/MovieCutterAPI.csproj" />
   </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path="docker-compose.yml" />
+    <File Path="NuGet.Docker.config" />
+  </Folder>
 </Solution>

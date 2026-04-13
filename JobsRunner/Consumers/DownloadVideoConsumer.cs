@@ -22,7 +22,7 @@ namespace JobsRunner.Consumers
                 WorkingDirectory = context.Message.OutputFolder,
             };
 
-            await ProcessRunner.RunProcess(startInfo, context.CancellationToken);
+            await ProcessRunner.RunProcess(startInfo, context.CancellationToken, true);
 
             logger.LogInformation("Download process finished");
         }

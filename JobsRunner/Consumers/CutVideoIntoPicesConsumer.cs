@@ -25,7 +25,7 @@ namespace JobsRunner.Consumers
                     CreateNoWindow = true,
                 };
 
-                await ProcessRunner.RunProcess(startInfo, context.CancellationToken);
+                await ProcessRunner.RunProcess(startInfo, context.CancellationToken, true);
 
                 videoNumber++;
             }
