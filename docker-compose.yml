@@ -1,0 +1,76 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: MovieCutterAPI/Dockerfile
+    container_name: movie-cutter-api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_HTTP_PORTS: "8080"
+      ConnectionStrings__MovieCutterMSSQL: "Data Source=sqlserver_2022;Initial Catalog=MovieCutter;User ID=sa;Password=Dokurw!0neHaslo123;MultipleActiveResultSets=False;Encrypt=False;TrustServerCertificate=True;Connection Timeout=30;"
+      FolderPaths__FramesFolderPath: "/app/storage/frames/"
+      FolderPaths__DownloadFolderPath: "/app/storage/vids/"
+      Serilog__WriteTo__0__Args__serverUrl: "http://seq:80"
+      RabbitMQ__Host: "rabbitmq"
+      RabbitMQ__VirtualHost: "/"
+      RabbitMQ__Username: "admin"
+      RabbitMQ__Password: "admin"
+      RabbitMQ__Port: "5672"
+    ports:
+      - "8004:8080"
+    volumes:
+      - "D:/1. IT/5. Development/Applications/MovieCutter:/app/storage"
+    networks:
+      - shared-infra
+
+  jobsrunner:
+    build:
+      context: .
+      dockerfile: JobsRunner/Dockerfile
+    container_name: movie-cutter-jobs-runner
+    environment:
+      DOTNET_ENVIRONMENT: Production
+      FolderPaths__FramesFolderPath: "/app/storage/frames/"
+      FolderPaths__DownloadFolderPath: "/app/storage/vids/"
+      Serilog__WriteTo__0__Args__serverUrl: "http://seq:80"
+      RabbitMQ__Host: "rabbitmq"
+      RabbitMQ__VirtualHost: "/"
+      RabbitMQ__Username: "admin"
+      RabbitMQ__Password: "admin"
+      RabbitMQ__Port: "5672"
+      RabbitMQ__Queues__DownloadVideoSettings__Name: "download-video-queue"
+      RabbitMQ__Queues__DownloadVideoSettings__PrefetchCount: "3"
+      RabbitMQ__Queues__DownloadVideoSettings__RetryCount: "3"
+      RabbitMQ__Queues__DownloadVideoSettings__RetryIntervalSeconds: "15"
+      RabbitMQ__Queues__CutVideoIntoFramesSettings__Name: "cut-into-frames-queue"
+      RabbitMQ__Queues__CutVideoIntoFramesSettings__PrefetchCount: "3"
+      RabbitMQ__Queues__CutVideoIntoFramesSettings__RetryCount: "3"
+      RabbitMQ__Queues__CutVideoIntoFramesSettings__RetryIntervalSeconds: "15"
+      RabbitMQ__Queues__CutVideoIntoPicesSettings__Name: "cut-into-pices-queue"
+      RabbitMQ__Queues__CutVideoIntoPicesSettings__PrefetchCount: "3"
+      RabbitMQ__Queues__CutVideoIntoPicesSettings__RetryCount: "3"
+      RabbitMQ__Queues__CutVideoIntoPicesSettings__RetryIntervalSeconds: "15"
+      RabbitMQ__Queues__DownloadAndCutVideoSettings__Name: "download-and-cut-video-queue"
+      RabbitMQ__Queues__DownloadAndCutVideoSettings__PrefetchCount: "3"
+      RabbitMQ__Queues__DownloadAndCutVideoSettings__RetryCount: "3"
+      RabbitMQ__Queues__DownloadAndCutVideoSettings__RetryIntervalSeconds: "15"
+    volumes:
+      - "D:/1. IT/5. Development/Applications/MovieCutter:/app/storage"
+    networks:
+      - shared-infra
+
+  webapp:
+    build:
+      context: MovieCutterWebApp
+      dockerfile: Dockerfile
+    container_name: movie-cutter-web-app
+    ports:
+      - "8002:80"
+    depends_on:
+      - api
+    networks:
+      - shared-infra
+
+networks:
+  shared-infra:
+    external: true

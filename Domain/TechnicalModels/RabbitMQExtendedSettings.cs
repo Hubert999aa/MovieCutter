@@ -12,11 +12,13 @@ namespace JobsRunner.Options
         public required DownloadVideoSettings DownloadVideoSettings { get; init; }
         public required CutVideoIntoFramesSettings CutVideoIntoFramesSettings { get; init; }
         public required CutVideoIntoPicesSettings CutVideoIntoPicesSettings { get; init; }
+        public required DownloadAndCutVideoSettings DownloadAndCutVideoSettings { get; init; }
     }
 
     public sealed class DownloadVideoSettings : ConsumerQueueSettings { }
     public sealed class CutVideoIntoFramesSettings : ConsumerQueueSettings { }
     public sealed class CutVideoIntoPicesSettings : ConsumerQueueSettings { }
+    public sealed class DownloadAndCutVideoSettings : ConsumerQueueSettings { }
 
     public abstract class ConsumerQueueSettings
     {

@@ -23,7 +23,7 @@ namespace JobsRunner.Consumers
                 CreateNoWindow = true,
             };
 
-            await ProcessRunner.RunProcess(startInfo, context.CancellationToken);
+            await ProcessRunner.RunProcess(startInfo, context.CancellationToken, true);
 
             logger.LogInformation("Cutting into frames process finished");
         }

@@ -54,15 +54,9 @@
               [formControl]="urlControl"
               autocomplete="off"
               aria-label="Link do wideo"
-              (keydown.enter)="submitLink()"
+              (keydown.enter)="submit()"
             />
           </div>
-          <p-button
-            label="Zaplanuj pobieranie"
-            icon="pi pi-download"
-            (onClick)="submitLink()"
-            aria-label="Zaplanuj pobieranie z podanego linku"
-          />
         </div>
       </section>
     }
@@ -301,22 +295,163 @@
         </section>
       }
 
-      <!-- Submit bar ── pojawia się po wyborze wideo ───────────────────── -->
-      @if (selectedVideo()) {
-        <div class="submit-bar" role="region" aria-label="Podsumowanie pobierania" aria-live="polite">
-          <div class="submit-info">
-            <i class="pi pi-video" aria-hidden="true"></i>
-            <span class="submit-title">{{ selectedVideo()!.title }}</span>
+    }
+
+    <!-- ─────────────────────────────────────────────────────────────────── -->
+    <!-- PROCESSING SECTION — appears once URL is valid / video selected     -->
+    <!-- ─────────────────────────────────────────────────────────────────── -->
+    @if (showProcessingSection()) {
+      <section class="processing-section" aria-labelledby="processing-title">
+
+        <h2 id="processing-title" class="section-label">Opcje pobierania</h2>
+
+        <!-- Action cards -->
+        <div class="action-cards" role="radiogroup" aria-label="Wybierz akcję po pobraniu">
+          <button
+            class="action-card"
+            type="button"
+            [class.action-card--active]="processingAction() === 'download-only'"
+            role="radio"
+            [attr.aria-checked]="processingAction() === 'download-only'"
+            (click)="setProcessingAction('download-only')"
+          >
+            <i class="pi pi-download" aria-hidden="true"></i>
+            <span class="action-card__title">Tylko pobierz</span>
+            <span class="action-card__desc">Pobierz wideo bez dalszej obróbki</span>
+          </button>
+          <button
+            class="action-card"
+            type="button"
+            [class.action-card--active]="processingAction() === 'download-and-cut'"
+            role="radio"
+            [attr.aria-checked]="processingAction() === 'download-and-cut'"
+            (click)="setProcessingAction('download-and-cut')"
+          >
+            <i class="pi pi-sliders-h" aria-hidden="true"></i>
+            <span class="action-card__title">Pobierz + obróbka</span>
+            <span class="action-card__desc">Pobierz i automatycznie podziel wideo</span>
+          </button>
+        </div>
+
+        <!-- Cutting options ─────────────────────────────────────────────── -->
+        @if (processingAction() === 'download-and-cut') {
+          <div class="cutting-options">
+
+            <!-- Cutting mode tabs -->
+            <div class="mode-tabs cutting-mode-tabs" role="tablist" aria-label="Tryb cięcia">
+              <button
+                class="mode-tab"
+                [class.mode-tab--active]="cuttingMode() === 'frames'"
+                role="tab"
+                [attr.aria-selected]="cuttingMode() === 'frames'"
+                (click)="setCuttingMode('frames')"
+              >
+                <i class="pi pi-images" aria-hidden="true"></i>
+                Klatki
+              </button>
+              <button
+                class="mode-tab"
+                [class.mode-tab--active]="cuttingMode() === 'pieces'"
+                role="tab"
+                [attr.aria-selected]="cuttingMode() === 'pieces'"
+                (click)="setCuttingMode('pieces')"
+              >
+                <i class="pi pi-scissors" aria-hidden="true"></i>
+                Kawałki
+              </button>
+            </div>
+
+            @if (cuttingMode() === 'frames') {
+              <!-- Frames info -->
+              <div class="mode-info" role="status">
+                <i class="pi pi-info-circle" aria-hidden="true"></i>
+                Cały film zostanie automatycznie podzielony na klatki (obrazy).
+              </div>
+            } @else {
+              <!-- Pieces form -->
+              <form [formGroup]="form" aria-label="Definiuj kawałki wideo">
+                <div formArrayName="pieces" class="pieces-list">
+                  @for (piece of piecesArray.controls; track $index) {
+                    <div
+                      [formGroupName]="$index"
+                      class="piece-row"
+                      [attr.aria-label]="'Kawałek ' + ($index + 1)"
+                    >
+                      <span class="piece-label" aria-hidden="true">{{ $index + 1 }}</span>
+
+                      <div class="piece-field">
+                        <label [for]="'start-' + $index" class="field-label">Początek</label>
+                        <input
+                          [id]="'start-' + $index"
+                          type="text"
+                          pInputText
+                          class="time-input"
+                          placeholder="00:00:00"
+                          formControlName="startTime"
+                          [attr.aria-describedby]="piece.get('startTime')?.invalid && piece.get('startTime')?.touched ? 'start-err-' + $index : null"
+                          aria-required="true"
+                        />
+                        @if (piece.get('startTime')?.invalid && piece.get('startTime')?.touched) {
+                          <span [id]="'start-err-' + $index" class="time-error" role="alert">Format: HH:MM:SS</span>
+                        }
+                      </div>
+
+                      <div class="piece-separator" aria-hidden="true">→</div>
+
+                      <div class="piece-field">
+                        <label [for]="'end-' + $index" class="field-label">Koniec</label>
+                        <input
+                          [id]="'end-' + $index"
+                          type="text"
+                          pInputText
+                          class="time-input"
+                          placeholder="00:00:00"
+                          formControlName="endTime"
+                          [attr.aria-describedby]="piece.get('endTime')?.invalid && piece.get('endTime')?.touched ? 'end-err-' + $index : null"
+                          aria-required="true"
+                        />
+                        @if (piece.get('endTime')?.invalid && piece.get('endTime')?.touched) {
+                          <span [id]="'end-err-' + $index" class="time-error" role="alert">Format: HH:MM:SS</span>
+                        }
+                      </div>
+
+                      @if (piecesArray.length > 1) {
+                        <button
+                          type="button"
+                          class="remove-btn"
+                          (click)="removePiece($index)"
+                          [attr.aria-label]="'Usuń kawałek ' + ($index + 1)"
+                        >
+                          <i class="pi pi-times" aria-hidden="true"></i>
+                        </button>
+                      }
+                    </div>
+                  }
+                </div>
+              </form>
+
+              <button type="button" class="add-piece-btn" (click)="addPiece()">
+                <i class="pi pi-plus" aria-hidden="true"></i>
+                Dodaj kawałek
+              </button>
+            }
+
           </div>
+        }
+
+        <!-- Submit ──────────────────────────────────────────────────────── -->
+        <div class="processing-submit">
           <p-button
-            label="Zaplanuj pobieranie"
-            icon="pi pi-download"
-            (onClick)="submitProfile()"
-            aria-label="Zaplanuj pobieranie wybranego wideo"
+            [label]="submitting() ? 'Zlecanie...' : 'Zatwierdź'"
+            icon="pi pi-check"
+            [disabled]="!canSubmit()"
+            [loading]="submitting()"
+            (onClick)="submit()"
+            aria-label="Zatwierdź i zaplanuj zadanie"
           />
         </div>
-      }
 
+      </section>
     }
 
   </div>

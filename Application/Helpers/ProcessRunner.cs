@@ -33,6 +33,7 @@ namespace Application.Helpers
                     {
                         if (!process.HasExited)
                         {
+                            Log.Warning("Process killed by cancellationToken");
                             process.Kill(entireProcessTree: true);
                         }
                     });

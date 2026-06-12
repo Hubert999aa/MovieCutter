@@ -1,6 +1,16 @@
 import { Component, ChangeDetectionStrategy, signal, computed, inject, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  AbstractControl,
+  FormArray,
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  ValidatorFn,
+  Validators,
+} from '@angular/forms';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { map, startWith } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 
@@ -16,6 +26,21 @@ import { sourcesConfig } from '@shared/static-data/sources-config';
 import { getAvatarColor, getInitials } from '@shared/helpers/avatar.helper';
 
 export type DownloadMode = 'link' | 'profile';
+export type ProcessingAction = 'download-only' | 'download-and-cut';
+export type CuttingMode = 'frames' | 'pieces';
+
+type PieceGroup = FormGroup<{
+  startTime: FormControl<string>;
+  endTime: FormControl<string>;
+}>;
+
+function timeFormatValidator(): ValidatorFn {
+  return (control: AbstractControl) => {
+    const v = control.value as string;
+    if (!v) return null;
+    return /^\d{2}:\d{2}:\d{2}$/.test(v) ? null : { timeFormat: true };
+  };
+}
 
 @Component({
   selector: 'app-request-download',
@@ -34,6 +59,8 @@ export class RequestDownloadComponent implements OnInit {
   readonly platformConfig = sourcesConfig;
   readonly getAvatarColor = getAvatarColor;
   readonly getInitials = getInitials;
+
+  // ── Download mode ────────────────────────────────────────────────────────────
 
   readonly mode = signal<DownloadMode>('link');
 
@@ -54,19 +81,158 @@ export class RequestDownloadComponent implements OnInit {
   readonly videosLoading = signal(false);
   readonly selectedVideo = signal<Video | null>(null);
 
-  readonly canSubmitLink = computed(() => this.urlControl.valid);
-  readonly canSubmitProfile = computed(() => this.selectedVideo() !== null);
+  // ── Processing options ───────────────────────────────────────────────────────
+
+  readonly processingAction = signal<ProcessingAction>('download-only');
+  readonly cuttingMode = signal<CuttingMode>('frames');
+  readonly submitting = signal(false);
+
+  readonly form = new FormGroup({
+    pieces: new FormArray<PieceGroup>([]),
+  });
+
+  get piecesArray(): FormArray<PieceGroup> {
+    return this.form.get('pieces') as FormArray<PieceGroup>;
+  }
+
+  private readonly urlStatus = toSignal(
+    this.urlControl.statusChanges.pipe(startWith(this.urlControl.status)),
+    { initialValue: this.urlControl.status }
+  );
+
+  private readonly piecesFormStatus = toSignal(
+    this.form.statusChanges.pipe(startWith(this.form.status), map(() => this.form.status)),
+    { initialValue: this.form.status }
+  );
+
+  readonly showProcessingSection = computed(() =>
+    this.mode() === 'link' ? this.urlStatus() === 'VALID' : this.selectedVideo() !== null
+  );
+
+  readonly canSubmit = computed(() => {
+    if (this.submitting() || !this.showProcessingSection()) return false;
+    if (this.processingAction() === 'download-only') return true;
+    if (this.cuttingMode() === 'frames') return true;
+    return this.piecesFormStatus() === 'VALID' && this.piecesArray.length > 0;
+  });
+
+  // ── Lifecycle ────────────────────────────────────────────────────────────────
 
   ngOnInit(): void {
     this.loadProfiles();
+    this.addPiece();
   }
+
+  // ── Mode control ─────────────────────────────────────────────────────────────
 
   setMode(mode: DownloadMode): void {
     if (this.mode() === mode) return;
     this.mode.set(mode);
     this.resetProfileState();
     this.urlControl.reset();
+    this.resetProcessing();
   }
+
+  // ── Processing control ───────────────────────────────────────────────────────
+
+  setProcessingAction(action: ProcessingAction): void {
+    this.processingAction.set(action);
+  }
+
+  setCuttingMode(mode: CuttingMode): void {
+    this.cuttingMode.set(mode);
+  }
+
+  addPiece(): void {
+    this.piecesArray.push(
+      new FormGroup({
+        startTime: new FormControl('', {
+          nonNullable: true,
+          validators: [Validators.required, timeFormatValidator()],
+        }),
+        endTime: new FormControl('', {
+          nonNullable: true,
+          validators: [Validators.required, timeFormatValidator()],
+        }),
+      }) as PieceGroup
+    );
+  }
+
+  removePiece(index: number): void {
+    this.piecesArray.removeAt(index);
+  }
+
+  // ── Submit ───────────────────────────────────────────────────────────────────
+
+  submit(): void {
+    if (!this.canSubmit()) return;
+    if (this.processingAction() === 'download-only') {
+      this.submitDownloadOnly();
+    } else {
+      this.submitDownloadAndCut();
+    }
+  }
+
+  private getUrl(): string {
+    return this.mode() === 'link'
+      ? this.urlControl.value
+      : (this.selectedVideo()?.url ?? '');
+  }
+
+  private submitDownloadOnly(): void {
+    const url = this.getUrl();
+    if (!url) return;
+    this.submitting.set(true);
+    this.videoProcessingService.requestVideoDownload(url).subscribe({
+      next: () => {
+        this.submitting.set(false);
+        this.router.navigate(['/']);
+      },
+      error: err => {
+        this.submitting.set(false);
+        this.toast.error(err);
+      },
+    });
+  }
+
+  private submitDownloadAndCut(): void {
+    const url = this.getUrl();
+    if (!url) return;
+
+    const cutVideoInOnePiece = this.cuttingMode() === 'frames';
+    const videoPices =
+      this.cuttingMode() === 'frames'
+        ? []
+        : this.piecesArray.controls.map(g => ({
+            startTime: g.controls.startTime.value,
+            endTime: g.controls.endTime.value,
+          }));
+
+    this.submitting.set(true);
+    this.videoProcessingService
+      .requestDownloadAndCutVideo({ url, cutVideoInOnePiece, videoPices })
+      .subscribe({
+        next: () => {
+          this.submitting.set(false);
+          this.router.navigate(['/']);
+        },
+        error: err => {
+          this.submitting.set(false);
+          this.toast.error(err);
+        },
+      });
+  }
+
+  private resetProcessing(): void {
+    this.processingAction.set('download-only');
+    this.cuttingMode.set('frames');
+    while (this.piecesArray.length > 0) {
+      this.piecesArray.removeAt(0);
+    }
+    this.addPiece();
+  }
+
+  // ── Profile flow ─────────────────────────────────────────────────────────────
 
   private loadProfiles(): void {
     this.profilesLoading.set(true);
@@ -88,6 +254,7 @@ export class RequestDownloadComponent implements OnInit {
     this.selectedSource.set(null);
     this.videos.set([]);
     this.selectedVideo.set(null);
+    this.resetProcessing();
     this.loadSources(profile.idProfile);
   }
 
@@ -113,6 +280,7 @@ export class RequestDownloadComponent implements OnInit {
     this.selectedSource.set(source);
     this.videos.set([]);
     this.selectedVideo.set(null);
+    this.resetProcessing();
     this.loadVideos(source.id);
   }
 
@@ -120,6 +288,7 @@ export class RequestDownloadComponent implements OnInit {
     this.selectedSource.set(null);
     this.videos.set([]);
     this.selectedVideo.set(null);
+    this.resetProcessing();
   }
 
   private loadVideos(idSource: number): void {
@@ -137,35 +306,9 @@ export class RequestDownloadComponent implements OnInit {
   }
 
   selectVideo(video: Video): void {
-    this.selectedVideo.set(
-      this.selectedVideo()?.idVideo === video.idVideo ? null : video
-    );
-  }
-
-  submitLink(): void {
-    if (this.urlControl.invalid) return;
-    this.videoProcessingService.requestVideoDownload(this.urlControl.value).subscribe({
-      next: () => {
-        this.router.navigate(['/']);
-      },
-      error: err => {
-        this.toast.error(err);
-      },
-    });
-  }
-
-  submitProfile(): void {
-    const video = this.selectedVideo();
-    const source = this.selectedSource();
-    if (!video || !source) return;
-    this.videoProcessingService.requestVideoDownload(video.url).subscribe({
-      next: () => {
-        this.router.navigate(['/']);
-      },
-      error: err => {
-        this.toast.error(err);
-      },
-    });
+    const wasSelected = this.selectedVideo()?.idVideo === video.idVideo;
+    this.selectedVideo.set(wasSelected ? null : video);
+    if (wasSelected) this.resetProcessing();
   }
 
   private resetProfileState(): void {
@@ -174,5 +317,6 @@ export class RequestDownloadComponent implements OnInit {
     this.selectedSource.set(null);
     this.videos.set([]);
     this.selectedVideo.set(null);
+    this.resetProcessing();
   }
 }

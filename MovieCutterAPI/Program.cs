@@ -47,10 +47,6 @@ using (var serviceScope = app.Services.CreateScope())
 app.Run();
 
 //ToDo:
-// 1. Add UI for the application
-
-
-//Ideas:
-// 1. Extend download feature, so we will be able to cut the video into frames straight after downloading
-// 2. Add possibility to check current progress of the process
+// 1. Add more data logging - so we would know what and where happend during docker runs
+// 2. Add possibility to check current progress of every process
 // 3. Create tests in the application
