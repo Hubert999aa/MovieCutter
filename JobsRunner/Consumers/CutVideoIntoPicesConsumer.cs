@@ -9,6 +9,7 @@ namespace JobsRunner.Consumers
     {
         public async Task Consume(ConsumeContext<CutVideoIntoPicesMessage> context)
         {
+            /*
             logger.LogInformation("Setup cutting into pices process");
             var videoNumber = 1;
 
@@ -31,6 +32,7 @@ namespace JobsRunner.Consumers
             }
 
             logger.LogInformation("Cutting into pices process finished");
+            */
         }
     }
 }

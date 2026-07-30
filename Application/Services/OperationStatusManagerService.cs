@@ -8,7 +8,7 @@ namespace Application.Services
         //
 
 
-        public void UpdateOperationStatus(OperationStatus status)
+        public void UpdateOperationStatus(int operationId, OperationStatus status)
         {
             // Aktualizacja statusu dla konkretnego video
 
@@ -17,7 +17,7 @@ namespace Application.Services
             // Po rozpoznaniu video, zmapowaniu postępu wysyłamy zmianę do SignalR i zapisujemy zmianę w bazie danych
         }
 
-        public void UpdateOperationProgress(VideoProcess processType, int progress)
+        public void UpdateOperationProgress(int operationId, VideoProcess processType, int progress)
         {
 
         }

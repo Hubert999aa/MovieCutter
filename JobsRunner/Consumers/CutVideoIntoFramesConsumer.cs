@@ -9,6 +9,7 @@ namespace JobsRunner.Consumers
     {
         public async Task Consume(ConsumeContext<CutVideoIntoFramesMessage> context)
         {
+            /*
             logger.LogInformation("Setup cutting into frames process");
 
             Directory.CreateDirectory(context.Message.OutputFolder);
@@ -26,6 +27,7 @@ namespace JobsRunner.Consumers
             await ProcessRunner.RunProcess(startInfo, context.CancellationToken, true);
 
             logger.LogInformation("Cutting into frames process finished");
+            */
         }
     }
 }

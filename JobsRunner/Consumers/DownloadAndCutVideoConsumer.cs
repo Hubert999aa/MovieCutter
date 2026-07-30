@@ -8,6 +8,7 @@ namespace JobsRunner.Consumers
 {
     public class DownloadAndCutVideoConsumer(ILogger<DownloadAndCutVideoConsumer> logger) : IConsumer<DownloadAndCutVideoMessage>
     {
+        /*
         public async Task Consume(ConsumeContext<DownloadAndCutVideoMessage> context)
         {
             logger.LogInformation("Setup download and cutting process");
@@ -126,6 +127,11 @@ namespace JobsRunner.Consumers
 
             await ProcessRunner.RunProcess(videoFramesStartInfo, context.CancellationToken, true);
             logger.LogInformation("Download and cutting process - Cutting into frames finished");
+        }
+        */
+        public Task Consume(ConsumeContext<DownloadAndCutVideoMessage> context)
+        {
+            throw new NotImplementedException();
         }
     }
 }
