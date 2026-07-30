@@ -70,6 +70,10 @@ namespace Persistance.Contexts
                    .HasMaxLength(100)
                    .IsRequired();
 
+                opt.Property(p => p.VideoExtension)
+                   .HasMaxLength(5)
+                   .IsRequired();
+
                 opt.Property(p => p.OperationStatus)
                    .HasConversion<int>();
 

@@ -6,6 +6,7 @@ namespace Domain.BusinessModels.DatabaseModels
     {
         public int IdOperation { get; set; }
         public string VideoName { get; set; } = string.Empty;
+        public string VideoExtension { get; set; } = string.Empty;
         public OperationType OperationType { get; set; }
         public OperationStatus OperationStatus { get; set; } = OperationStatus.Queued;
         public VideoProcess VideoProcess { get; set; }
