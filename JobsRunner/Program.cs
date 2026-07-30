@@ -1,6 +1,8 @@
 using JobsRunner;
 using JobsRunner.Options;
 using Serilog;
+using Persistance;
+using Application;
 
 var builder = Host.CreateApplicationBuilder(args);
 
@@ -17,6 +19,9 @@ var rabbitMqSettings = builder.Configuration
 // MassTransit
 JobsRunnerStartupConfiguration.ConfigureMassTransit(builder.Services, builder.Configuration, rabbitMqSettings);
 
+//Persistance and Application
+builder.Services.AddApplicationLayer(builder.Configuration);
+builder.Services.AddPersistanceLayer(builder.Configuration);
 
 
 var host = builder.Build();

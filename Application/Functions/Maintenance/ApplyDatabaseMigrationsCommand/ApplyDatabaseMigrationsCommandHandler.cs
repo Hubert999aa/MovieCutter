@@ -9,7 +9,7 @@ namespace Application.Functions.Maintenance.ApplyDatabaseMigrationsCommand
     {
         public async Task<BaseResponse> Handle(ApplyDatabaseMigrationsCommand request, CancellationToken cancellationToken)
         {
-            Log.Information("Starting calorie database migrations update checking");
+            Log.Information("Starting database migrations update checking");
             await _context.MigrateAsync();
 
             return new BaseResponse();

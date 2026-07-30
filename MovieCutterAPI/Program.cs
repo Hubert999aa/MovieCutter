@@ -4,6 +4,7 @@ using MyMediator.Interfaces;
 using Persistance;
 using Serilog;
 using Domain.TechnicalModels;
+using MassTransit;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +17,22 @@ builder.Services.Configure<FolderPathsOptions>(builder.Configuration.GetSection(
 
 builder.Services.AddApplicationLayer(builder.Configuration);
 builder.Services.AddPersistanceLayer(builder.Configuration);
+
+var rabbitMqSettings = builder.Configuration.GetSection("RabbitMQ")
+                .Get<RabbitMQBaseSettings>()
+                ?? throw new InvalidOperationException("RabbitMQ configuration is missing");
+
+builder.Services.AddMassTransit(x =>
+{
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        cfg.Host(rabbitMqSettings.Host, rabbitMqSettings.VirtualHost, h =>
+        {
+            h.Username(rabbitMqSettings.Username);
+            h.Password(rabbitMqSettings.Password);
+        });
+    });
+});
 
 builder.Services.AddControllers();
 
