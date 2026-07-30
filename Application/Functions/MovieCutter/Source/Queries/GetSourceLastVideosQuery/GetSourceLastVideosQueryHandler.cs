@@ -1,12 +1,14 @@
-﻿using Application.Interfaces;
-using MyMediator.Interfaces;
-using Domain.BusinessModels;
-using Application.Helpers;
-using Microsoft.EntityFrameworkCore;
-using System.Diagnostics;
-using System.Text.Json;
+﻿using Application.Helpers;
+using Application.Interfaces;
 using CoreModels.TechnicalEnums;
 using CoreModels.TechnicalModels;
+using Domain.BusinessModels;
+using Microsoft.EntityFrameworkCore;
+using MyMediator.Interfaces;
+using Serilog;
+using System.Diagnostics;
+using System.Text.Json;
+using System.Threading.Channels;
 
 namespace Application.Functions.MovieCutter.Source.Queries.GetSourceLastVideosQuery
 {
@@ -21,10 +23,7 @@ namespace Application.Functions.MovieCutter.Source.Queries.GetSourceLastVideosQu
                 .Select(p => p.BaseUrl)
                 .SingleOrDefaultAsync();
 
-            if (string.IsNullOrEmpty(sourceBaseUrl))
-            {
-                return new BaseResponse(false, ResponseStatus.ValidationError, "No url found");
-            }
+            if (string.IsNullOrEmpty(sourceBaseUrl)) return new BaseResponse(false, ResponseStatus.ValidationError, "No url found");
 
             var processInfo = new ProcessStartInfo
             {
@@ -37,34 +36,33 @@ namespace Application.Functions.MovieCutter.Source.Queries.GetSourceLastVideosQu
                 StandardOutputEncoding = System.Text.Encoding.UTF8
             };
 
-            Func<Process, Task<List<VideoMetadata>>> customBehaviour = async (process) =>
+            var messageChannel = Channel.CreateUnbounded<string>();
+            var processTask = ProcessRunner.RunProcess(processInfo, messageChannel.Writer, cancellationToken);
+            var videoList = new List<VideoMetadata>();
+
+            await foreach (var message in messageChannel.Reader.ReadAllAsync())
             {
-                var videos = new List<VideoMetadata>();
-
-                using (var reader = process.StandardOutput)
+                if (message.StartsWith("[Error]")) Log.Warning(message);
+                
+                if (message.StartsWith("[Message]"))
                 {
-                    string? line;
-                    while ((line = await reader.ReadLineAsync()) != null)
+                    var messageArray = message.Split("[Message]");
+                    using (var jsonDocument = JsonDocument.Parse(messageArray[1]))
                     {
-                        using (var jsonDocument = JsonDocument.Parse(line))
+                        var root = jsonDocument.RootElement;
+                        var video = new VideoMetadata
                         {
-                            var root = jsonDocument.RootElement;
-                            var video = new VideoMetadata
-                            {
-                                Id = root.GetProperty("id").GetString()!,
-                                Title = root.GetProperty("title").GetString()!,
-                                Url = root.GetProperty("url").GetString()!,
-                            };
+                            Id = root.GetProperty("id").GetString()!,
+                            Title = root.GetProperty("title").GetString()!,
+                            Url = root.GetProperty("url").GetString()!,
+                        };
 
-                            videos.Add(video);
-                        }
+                        videoList.Add(video);
                     }
                 }
+            }
 
-                return videos;
-            };
-
-            var videoList = await ProcessRunner.RunProcessWithCustomBehaviour(processInfo, cancellationToken, customBehaviour);
+            await processTask;
             return new BaseResponse(videoList);
         }
     }
