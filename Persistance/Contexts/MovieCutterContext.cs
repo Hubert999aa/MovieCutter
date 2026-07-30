@@ -11,6 +11,7 @@ namespace Persistance.Contexts
 
         public DbSet<Profile> Profiles { get; set; }
         public DbSet<Source> Sources { get; set; }
+        public DbSet<Operation> Operations { get; set; }
 
         public Task MigrateAsync()
         {
@@ -57,6 +58,26 @@ namespace Persistance.Contexts
                    .WithMany(p => p.Sources)
                    .HasForeignKey(p => p.IdProfile)
                    .OnDelete(DeleteBehavior.ClientCascade);
+            });
+
+            modelBuilder.Entity<Operation>(opt =>
+            {
+                opt.HasKey(p => p.IdOperation);
+                opt.Property(p => p.IdOperation)
+                   .ValueGeneratedOnAdd();
+
+                opt.Property(p => p.VideoName)
+                   .HasMaxLength(100)
+                   .IsRequired();
+
+                opt.Property(p => p.OperationStatus)
+                   .HasConversion<int>();
+
+                opt.Property(p => p.OperationType)
+                   .HasConversion<int>();
+
+                opt.Property(p => p.VideoProcess)
+                   .HasConversion<int>();
             });
         }
     }
