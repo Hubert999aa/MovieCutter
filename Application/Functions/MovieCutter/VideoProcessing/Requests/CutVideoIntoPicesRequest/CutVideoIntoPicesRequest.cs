@@ -7,6 +7,6 @@ namespace Application.Functions.MovieCutter.VideoProcessing.Requests.CutVideoInt
     public class CutVideoIntoPicesRequest : IRequest<BaseResponse>
     {
         public required string SourceVideoFullPath { get; set; }
-        public required List<VideoPice> VideoPices { get; set; }
+        public required List<VideoPiece> VideoPices { get; set; }
     }
 }

@@ -6,6 +6,6 @@
         public required string VideoOutputFolder { get; set; }
         public required string FramesOutputFolder { get; set; }
         public required bool CutVideoInOnePiece { get; set; }
-        public required IEnumerable<VideoPice> NewPices { get; set; }
+        public required IEnumerable<VideoPiece> NewPices { get; set; }
     }
 }

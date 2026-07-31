@@ -27,6 +27,7 @@ builder.Services.AddPersistanceLayer(builder.Configuration);
 
 // JobRunner services
 builder.Services.AddScoped<IVideoDownloader, VideoDownloaderService>();
+builder.Services.AddScoped<IVideoProcessor, VideoProcessorService>();
 
 var host = builder.Build();
 

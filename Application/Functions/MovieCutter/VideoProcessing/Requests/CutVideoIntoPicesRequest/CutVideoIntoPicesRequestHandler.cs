@@ -1,17 +1,49 @@
 ﻿using Application.Helpers;
-using MyMediator.Interfaces;
-using Domain.ConsumersContracts;
+using Application.Interfaces;
 using CoreModels.TechnicalEnums;
 using CoreModels.TechnicalModels;
+using Domain.BusinessEnums;
+using Domain.BusinessModels.DatabaseModels;
+using Domain.ConsumersContracts;
+using Domain.TechnicalModels;
 using MassTransit;
 using Microsoft.Extensions.Options;
-using Domain.TechnicalModels;
+using MyMediator.Interfaces;
 
 namespace Application.Functions.MovieCutter.VideoProcessing.Requests.CutVideoIntoPicesRequest
 {
-    public class CutVideoIntoPicesRequestHandler(IPublishEndpoint _publishEndpoint, IOptions<FolderPathsOptions> _folderPathsOptions) : IRequestHandler<CutVideoIntoPicesRequest, BaseResponse>
+    public class CutVideoIntoPicesRequestHandler(IPublishEndpoint _publishEndpoint, IOptions<FolderPathsOptions> _folderPathsOptions, IMovieCutterDatabase _databaseContext) : IRequestHandler<CutVideoIntoPicesRequest, BaseResponse>
     {
         public async Task<BaseResponse> Handle(CutVideoIntoPicesRequest request, CancellationToken cancellationToken)
+        {
+            var validationResponse = this.ValidateRequest(request);
+            if (!validationResponse.Success) return validationResponse;
+
+            var operation = new Operation
+            {
+                OperationType = OperationType.CuttingIntoPiecesOnly,
+                VideoProcess = VideoProcess.CuttingIntoPieces,
+                VideoName = FileNamer.GetFileNameWithoutExtension(request.SourceVideoFullPath),
+                VideoExtension = FileNamer.GetFileExtension(request.SourceVideoFullPath)
+            };
+
+            await _databaseContext.Operations.AddAsync(operation);
+            await _databaseContext.SaveChangesAsync();
+
+            var message = new CutVideoIntoPicesMessage
+            {
+                SourceVideoPath = request.SourceVideoFullPath,
+                DownloadFolderPath = _folderPathsOptions.Value.DownloadFolderPath,
+                NewPieces = request.VideoPices,
+                Operation = operation
+            };
+
+            await _publishEndpoint.Publish(message, cancellationToken);
+
+            return new BaseResponse();
+        }
+
+        public BaseResponse ValidateRequest(CutVideoIntoPicesRequest request)
         {
             bool videoPicesValid = true;
 
@@ -26,17 +58,6 @@ namespace Application.Functions.MovieCutter.VideoProcessing.Requests.CutVideoInt
 
             if (string.IsNullOrEmpty(request.SourceVideoFullPath)) return new BaseResponse(false, ResponseStatus.ValidationError, "SourceVideoFullPath cannot be empty");
             if (request.VideoPices.Count == 0 || !videoPicesValid) return new BaseResponse(false, ResponseStatus.ValidationError, "VideoPices must be defined properly");
-
-
-            var message = new CutVideoIntoPicesMessage
-            {
-                SourceVideoPath = request.SourceVideoFullPath,
-                NewVideoPathWithoutExtension = _folderPathsOptions.Value.DownloadFolderPath + FileNamer.GetFileNameWithoutExtension(request.SourceVideoFullPath),
-                NewVideoExtension = FileNamer.GetFileExtension(request.SourceVideoFullPath),
-                NewPices = request.VideoPices
-            };
-
-            await _publishEndpoint.Publish(message, cancellationToken);
 
             return new BaseResponse();
         }
