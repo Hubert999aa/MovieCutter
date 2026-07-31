@@ -1,26 +1,39 @@
 ﻿using Application.Helpers;
-using MyMediator.Interfaces;
-using Domain.ConsumersContracts;
+using Application.Interfaces;
 using CoreModels.TechnicalEnums;
 using CoreModels.TechnicalModels;
+using Domain.BusinessEnums;
+using Domain.BusinessModels.DatabaseModels;
+using Domain.ConsumersContracts;
+using Domain.TechnicalModels;
 using MassTransit;
 using Microsoft.Extensions.Options;
-using Domain.TechnicalModels;
+using MyMediator.Interfaces;
 
 namespace Application.Functions.MovieCutter.VideoProcessing.Requests.CutVideoIntoFramesRequest
 {
-    public class CutVideoIntoFramesRequestHandler(IPublishEndpoint _publishEndpoint, IOptions<FolderPathsOptions> _folderPathsOptions) : IRequestHandler<CutVideoIntoFramesRequest, BaseResponse>
+    public class CutVideoIntoFramesRequestHandler(IPublishEndpoint _publishEndpoint, IOptions<FolderPathsOptions> _folderPathsOptions, IMovieCutterDatabase _databaseContext) : IRequestHandler<CutVideoIntoFramesRequest, BaseResponse>
     {
         public async Task<BaseResponse> Handle(CutVideoIntoFramesRequest request, CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(request.SourceVideoFullPath)) return new BaseResponse(false, ResponseStatus.ValidationError, "SourceVideoFullPath cannot be empty");
 
-            var videoName = FileNamer.GetFileNameWithoutExtension(request.SourceVideoFullPath);
+            var operation = new Operation
+            {
+                OperationType = OperationType.CuttingIntoFramesOnly,
+                VideoProcess = VideoProcess.CuttingIntoFrames,
+                VideoName = FileNamer.GetFileNameWithoutExtension(request.SourceVideoFullPath),
+                VideoExtension = FileNamer.GetFileExtension(request.SourceVideoFullPath)
+            };
+
+            await _databaseContext.Operations.AddAsync(operation);
+            await _databaseContext.SaveChangesAsync();
+
             var message = new CutVideoIntoFramesMessage
             {
                 SourceVideoPath = request.SourceVideoFullPath,
-                VideoName = videoName,
-                OutputFolder = _folderPathsOptions.Value.FramesFolderPath + videoName + "\\",
+                FramesFolderPath = _folderPathsOptions.Value.FramesFolderPath,
+                Operation = operation
             };
 
             await _publishEndpoint.Publish(message, cancellationToken);
