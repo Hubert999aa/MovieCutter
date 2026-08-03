@@ -1,137 +1,76 @@
-﻿using Application.Helpers;
+﻿using Application.Interfaces;
+using Domain.BusinessEnums;
 using Domain.ConsumersContracts;
+using JobsRunner.Interfaces;
 using MassTransit;
-using Serilog;
-using System.Diagnostics;
+using Microsoft.EntityFrameworkCore;
 
 namespace JobsRunner.Consumers
 {
-    public class DownloadAndCutVideoConsumer(ILogger<DownloadAndCutVideoConsumer> logger) : IConsumer<DownloadAndCutVideoMessage>
+    public class DownloadAndCutVideoConsumer(IOperationStatusManager _operationStatusManager, IVideoDownloader _videoDownloader, IVideoProcessor _videoProcessor, IMovieCutterDatabase _databaseContext) : IConsumer<DownloadAndCutVideoMessage>
     {
-        /*
         public async Task Consume(ConsumeContext<DownloadAndCutVideoMessage> context)
         {
-            logger.LogInformation("Setup download and cutting process");
+            var operationId = context.Message.IdOperation;
+            _operationStatusManager.UpdateOperationStatus(operationId, OperationStatus.Processing);
 
-            await this.DownloadVideo(context);
-            var sourceVideoNameWithExtension = await this.GetVideoNameWithExtension(context);
+            // Downloading metadata
+            var downloadedSuccessfully = await _videoDownloader.DownloadVideoNameAndExtensionAsync(context.Message.Url, operationId, context.CancellationToken);
+            if (!downloadedSuccessfully)
+            {
+                _operationStatusManager.UpdateOperationStatus(operationId, OperationStatus.Error);
+                return;
+            }
+
+            // Downloading video
+            downloadedSuccessfully = await _videoDownloader.DownloadVideoAsync(context.Message.Url, context.Message.VideoOutputFolder, operationId, context.CancellationToken);
+            if (!downloadedSuccessfully)
+            {
+                _operationStatusManager.UpdateOperationStatus(operationId, OperationStatus.Error);
+                return;
+            }
+
+            // Getting updated video data
+            var operation = await _databaseContext.Operations.SingleAsync(p => p.IdOperation == operationId);
+            var sourceVideoPath = $"{context.Message.VideoOutputFolder}{operation.VideoName}.{operation.VideoExtension}";
+            var processedSuccessfully = true;
 
             if (context.Message.CutVideoInOnePiece)
             {
-                var sourceVideoFullPath = Path.Combine(context.Message.VideoOutputFolder, sourceVideoNameWithExtension);
-                await this.CutVideoIntoFrames(sourceVideoFullPath, sourceVideoNameWithExtension.Split(".")[0], context);
+                // Cutting whole video into frames
+                processedSuccessfully = await _videoProcessor.CutVideoFramesAsync(operationId, sourceVideoPath, context.Message.FramesOutputFolder, operation.VideoName, context.CancellationToken);
             }
             else
             {
-                await this.CutVideoIntoPiciesAndFrames(context, sourceVideoNameWithExtension);
-            }
+                // Cutting video into pieces and frames
+                var videoNumber = 1;
+                var newVideoPathWithoutExtension = $"{context.Message.VideoOutputFolder}{operation.VideoName}";
 
-            logger.LogInformation("Download and cutting finished");
-        }
-
-        private async Task DownloadVideo(ConsumeContext<DownloadAndCutVideoMessage> context)
-        {
-            logger.LogInformation("Download and cutting process - Download started");
-            var downloadStartInfo = new ProcessStartInfo
-            {
-                FileName = "yt-dlp",
-                Arguments = $"-o \"%(id)s.%(ext)s\" {context.Message.Url}",
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                CreateNoWindow = true,
-                WorkingDirectory = context.Message.VideoOutputFolder,
-            };
-
-            await ProcessRunner.RunProcess(downloadStartInfo, context.CancellationToken, true);
-            logger.LogInformation("Download and cutting process - Download finished");
-        }
-
-        private async Task<string> GetVideoNameWithExtension(ConsumeContext<DownloadAndCutVideoMessage> context)
-        {
-            var videoNameStartInfo = new ProcessStartInfo
-            {
-                FileName = "yt-dlp",
-                Arguments = $"--print \"%(id)s.%(ext)s\" {context.Message.Url}",
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true,
-                StandardOutputEncoding = System.Text.Encoding.UTF8
-            };
-
-            Func<Process, Task<string>> customBehaviour = async (process) =>
-            {
-                using (var reader = process.StandardOutput)
+                foreach (var piece in context.Message.NewPices)
                 {
-                    var line = await reader.ReadLineAsync();
-                    if (string.IsNullOrEmpty(line))
+                    processedSuccessfully = await _videoProcessor.CutVideoPieceAsync(piece, sourceVideoPath, newVideoPathWithoutExtension, operation.VideoExtension, videoNumber, context.CancellationToken);
+                    if (!processedSuccessfully)
                     {
-                        Log.Fatal("No output from yt-dlp");
-                        throw new Exception("No output from yt-dlp");
+                        _operationStatusManager.UpdateOperationStatus(operationId, OperationStatus.Error);
+                        break;
                     }
 
-                    return line.Trim();
+                    var newVideoPath = $"{newVideoPathWithoutExtension}_{videoNumber}.{operation.VideoExtension}";
+                    var newVideoName = $"{operation.VideoName}_{videoNumber}";
+                    processedSuccessfully = await _videoProcessor.CutVideoFramesAsync(operationId, newVideoPath, context.Message.FramesOutputFolder, "video name with number", context.CancellationToken);
+                    if (!processedSuccessfully)
+                    {
+                        _operationStatusManager.UpdateOperationStatus(operationId, OperationStatus.Error);
+                        break;
+                    }
+                    //var progress = (int)Math.Round(videoNumber * 100.0 / context.Message.NewPieces.Count());
+                    //_operationStatusManager.UpdateOperationProgress(operationId, VideoProcess.CuttingIntoPieces, progress);
+
+                    videoNumber++;
                 }
-            };
-
-            return await ProcessRunner.RunProcessWithCustomBehaviour(videoNameStartInfo, context.CancellationToken, customBehaviour);
-        }
-
-        private async Task CutVideoIntoPiciesAndFrames(ConsumeContext<DownloadAndCutVideoMessage> context, string sourceVideoNameWithExtension)
-        {
-            logger.LogInformation("Download and cutting process - Cutting into pieces started");
-            var videoNumber = 1;
-            var sourceVideoNameWithExtensionArray = sourceVideoNameWithExtension.Split('.');
-            var sourceVideoName = sourceVideoNameWithExtensionArray[0];
-            var sourceVideoExtension = sourceVideoNameWithExtensionArray[1];
-
-            foreach (var pice in context.Message.NewPices)
-            {
-                var newVideoPath = Path.Combine(context.Message.VideoOutputFolder, $"{sourceVideoName}_{videoNumber}.{sourceVideoExtension}");
-                var newVideoNameWithoutExtension = $"{sourceVideoName}_{videoNumber}";
-
-                var videoPiecesStartInfo = new ProcessStartInfo
-                {
-                    FileName = "ffmpeg",
-                    Arguments = $"-ss {pice.StartTime} -to {pice.EndTime} -i \"{context.Message.VideoOutputFolder + sourceVideoNameWithExtension}\" -c copy \"{newVideoPath}\"",
-                    UseShellExecute = false,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    CreateNoWindow = true,
-                };
-
-                await ProcessRunner.RunProcess(videoPiecesStartInfo, context.CancellationToken, true);
-                await this.CutVideoIntoFrames(newVideoPath, newVideoNameWithoutExtension, context);
-
-                videoNumber++;
-                logger.LogInformation("Download and cutting process - Cutting into pieces finished");
             }
-        }
 
-        private async Task CutVideoIntoFrames(string newVideoPath, string newVideoNameWithoutExtension, ConsumeContext<DownloadAndCutVideoMessage> context)
-        {
-            logger.LogInformation("Download and cutting process - Cutting into frames started");
-            var videoFramesFolderPath = Path.Combine(context.Message.FramesOutputFolder, newVideoNameWithoutExtension);
-            Directory.CreateDirectory(videoFramesFolderPath);
-
-            var videoFramesStartInfo = new ProcessStartInfo
-            {
-                FileName = "ffmpeg",
-                Arguments = $"-i \"{newVideoPath}\" -fps_mode passthrough \"{Path.Combine(videoFramesFolderPath, $"{newVideoNameWithoutExtension}_%06d.png")}\"",
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                CreateNoWindow = true,
-            };
-
-            await ProcessRunner.RunProcess(videoFramesStartInfo, context.CancellationToken, true);
-            logger.LogInformation("Download and cutting process - Cutting into frames finished");
-        }
-        */
-        public Task Consume(ConsumeContext<DownloadAndCutVideoMessage> context)
-        {
-            throw new NotImplementedException();
+            if (processedSuccessfully) _operationStatusManager.UpdateOperationStatus(operationId, OperationStatus.Finished);
         }
     }
 }

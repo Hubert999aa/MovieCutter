@@ -11,7 +11,6 @@ namespace JobsRunner.Consumers
         public async Task Consume(ConsumeContext<DownloadVideoMessage> context)
         {
             var operationId = context.Message.Operation.IdOperation;
-
             _operationStatusManager.UpdateOperationStatus(operationId, OperationStatus.Processing);
 
             var downloadedSuccessfully = await _videoDownloader.DownloadVideoNameAndExtensionAsync(context.Message.Url, operationId, context.CancellationToken);

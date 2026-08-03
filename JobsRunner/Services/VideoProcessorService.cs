@@ -17,7 +17,7 @@ namespace JobsRunner.Services
         public async Task<bool> CutVideoPieceAsync(VideoPiece piece, string sourcePath, string newVideoPathWithoutExtension, string videoExtension, int videoNumber, CancellationToken cancellationToken)
         {
             var processedSuccessfully = true;
-            var newVideoPath = $"{newVideoPathWithoutExtension}_{videoNumber}{videoExtension}";
+            var newVideoPath = $"{newVideoPathWithoutExtension}_{videoNumber}.{videoExtension}";
             var messageChannel = Channel.CreateUnbounded<string>();
             var processInfo = new ProcessStartInfo
             {

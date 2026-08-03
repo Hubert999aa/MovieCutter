@@ -1,5 +1,8 @@
-﻿using CoreModels.TechnicalEnums;
+﻿using Application.Interfaces;
+using CoreModels.TechnicalEnums;
 using CoreModels.TechnicalModels;
+using Domain.BusinessEnums;
+using Domain.BusinessModels.DatabaseModels;
 using Domain.ConsumersContracts;
 using Domain.TechnicalModels;
 using MassTransit;
@@ -8,7 +11,7 @@ using MyMediator.Interfaces;
 
 namespace Application.Functions.MovieCutter.VideoProcessing.Requests.DownloadAndCutVideoRequest
 {
-    public class DownloadAndCutVideoRequestHandler(IPublishEndpoint _publishEndpoint, IOptions<FolderPathsOptions> _folderPathsOptions)
+    public class DownloadAndCutVideoRequestHandler(IPublishEndpoint _publishEndpoint, IOptions<FolderPathsOptions> _folderPathsOptions, IMovieCutterDatabase _databaseContext)
         : IRequestHandler<DownloadAndCutVideoRequest, BaseResponse>
     {
         public async Task<BaseResponse> Handle(DownloadAndCutVideoRequest request, CancellationToken cancellationToken)
@@ -30,13 +33,23 @@ namespace Application.Functions.MovieCutter.VideoProcessing.Requests.DownloadAnd
                 if (request.VideoPices.Count == 0 || !videoPicesValid) return new BaseResponse(false, ResponseStatus.ValidationError, "VideoPices must be defined properly");
             }
 
+            var operation = new Operation
+            {
+                OperationType = OperationType.DownloadPiecesAndFrames,
+                VideoProcess = VideoProcess.Undefined,
+            };
+
+            await _databaseContext.Operations.AddAsync(operation);
+            await _databaseContext.SaveChangesAsync();
+
             var message = new DownloadAndCutVideoMessage
             {
                 Url = request.Url,
                 VideoOutputFolder = _folderPathsOptions.Value.DownloadFolderPath,
                 FramesOutputFolder = _folderPathsOptions.Value.FramesFolderPath,
                 CutVideoInOnePiece = request.CutVideoInOnePiece,
-                NewPices = request.VideoPices
+                NewPices = request.VideoPices,
+                IdOperation = operation.IdOperation
             };
 
             await _publishEndpoint.Publish(message, cancellationToken);
