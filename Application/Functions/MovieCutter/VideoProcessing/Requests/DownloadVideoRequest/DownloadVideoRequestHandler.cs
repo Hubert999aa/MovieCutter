@@ -2,7 +2,6 @@
 using CoreModels.TechnicalEnums;
 using CoreModels.TechnicalModels;
 using Domain.BusinessEnums;
-using Domain.BusinessModels.DatabaseModels;
 using Domain.ConsumersContracts;
 using Domain.TechnicalModels;
 using MassTransit;
@@ -17,10 +16,11 @@ namespace Application.Functions.MovieCutter.VideoProcessing.Requests.DownloadVid
         {
             if (string.IsNullOrEmpty(request.Url)) return new BaseResponse(false, ResponseStatus.ValidationError, "Url cannot be empty");
 
-            var operation = new Operation
+            var operation = new Domain.BusinessModels.DatabaseModels.Operation
             {
                 OperationType = OperationType.DownloadOnly,
                 VideoProcess = VideoProcess.Downloading,
+                VideoName = request.VideoName,
             };
 
             await _databaseContext.Operations.AddAsync(operation);

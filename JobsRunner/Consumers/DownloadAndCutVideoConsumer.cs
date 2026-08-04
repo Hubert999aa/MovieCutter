@@ -12,13 +12,13 @@ namespace JobsRunner.Consumers
         public async Task Consume(ConsumeContext<DownloadAndCutVideoMessage> context)
         {
             var operationId = context.Message.IdOperation;
-            _operationStatusManager.UpdateOperationStatus(operationId, OperationStatus.Processing);
+            await _operationStatusManager.UpdateOperationStatus(operationId, OperationStatus.Processing);
 
             // Downloading metadata
             var downloadedSuccessfully = await _videoDownloader.DownloadVideoNameAndExtensionAsync(context.Message.Url, operationId, context.CancellationToken);
             if (!downloadedSuccessfully)
             {
-                _operationStatusManager.UpdateOperationStatus(operationId, OperationStatus.Error);
+                await _operationStatusManager.UpdateOperationStatus(operationId, OperationStatus.Error);
                 return;
             }
 
@@ -26,7 +26,7 @@ namespace JobsRunner.Consumers
             downloadedSuccessfully = await _videoDownloader.DownloadVideoAsync(context.Message.Url, context.Message.VideoOutputFolder, operationId, context.CancellationToken);
             if (!downloadedSuccessfully)
             {
-                _operationStatusManager.UpdateOperationStatus(operationId, OperationStatus.Error);
+                await _operationStatusManager.UpdateOperationStatus(operationId, OperationStatus.Error);
                 return;
             }
 
@@ -51,26 +51,28 @@ namespace JobsRunner.Consumers
                     processedSuccessfully = await _videoProcessor.CutVideoPieceAsync(piece, sourceVideoPath, newVideoPathWithoutExtension, operation.VideoExtension, videoNumber, context.CancellationToken);
                     if (!processedSuccessfully)
                     {
-                        _operationStatusManager.UpdateOperationStatus(operationId, OperationStatus.Error);
+                        await _operationStatusManager.UpdateOperationStatus(operationId, OperationStatus.Error);
                         break;
                     }
 
                     var newVideoPath = $"{newVideoPathWithoutExtension}_{videoNumber}.{operation.VideoExtension}";
                     var newVideoName = $"{operation.VideoName}_{videoNumber}";
-                    processedSuccessfully = await _videoProcessor.CutVideoFramesAsync(operationId, newVideoPath, context.Message.FramesOutputFolder, "video name with number", context.CancellationToken);
+                    var newOutputFolder = $"{context.Message.FramesOutputFolder}{newVideoName}";
+                    processedSuccessfully = await _videoProcessor.CutVideoFramesAsync(operationId, newVideoPath, newOutputFolder, newVideoName, context.CancellationToken, false);
                     if (!processedSuccessfully)
                     {
-                        _operationStatusManager.UpdateOperationStatus(operationId, OperationStatus.Error);
+                        await _operationStatusManager.UpdateOperationStatus(operationId, OperationStatus.Error);
                         break;
                     }
-                    //var progress = (int)Math.Round(videoNumber * 100.0 / context.Message.NewPieces.Count());
-                    //_operationStatusManager.UpdateOperationProgress(operationId, VideoProcess.CuttingIntoPieces, progress);
+
+                    var progress = (int)Math.Round(videoNumber * 100.0 / context.Message.NewPices.Count());
+                    await _operationStatusManager.UpdateOperationProgress(operationId, VideoProcess.CuttingIntoPieces, progress);
 
                     videoNumber++;
                 }
             }
 
-            if (processedSuccessfully) _operationStatusManager.UpdateOperationStatus(operationId, OperationStatus.Finished);
+            if (processedSuccessfully) await _operationStatusManager.UpdateOperationStatus(operationId, OperationStatus.Finished);
         }
     }
 }

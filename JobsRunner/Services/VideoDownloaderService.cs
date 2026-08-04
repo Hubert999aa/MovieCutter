@@ -49,7 +49,7 @@ namespace JobsRunner.Services
 
                 if (message.StartsWith("[Message] [Merger]"))
                 {
-                    _operationStatusManager.UpdateOperationProgress(operationId, VideoProcess.Downloading, 99);
+                    await _operationStatusManager.UpdateOperationProgress(operationId, VideoProcess.Downloading, 99);
                     continue;
                 }
 
@@ -58,8 +58,8 @@ namespace JobsRunner.Services
                 {
                     if (double.TryParse(progressMessageMatch.Groups["value"].Value, NumberStyles.Float, CultureInfo.InvariantCulture, out var value))
                     {
-                        var percent = (int)Math.Round((value + 10) * 88); //Video download takes 10%-98%, as 99% is merging and 100% is done
-                        _operationStatusManager.UpdateOperationProgress(operationId, VideoProcess.Downloading, percent);
+                        var percent = (int)Math.Round(value * 98 / 100);
+                        await _operationStatusManager.UpdateOperationProgress(operationId, VideoProcess.Downloading, percent);
                     }
                 }
             }

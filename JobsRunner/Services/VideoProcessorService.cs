@@ -50,7 +50,7 @@ namespace JobsRunner.Services
             return processedSuccessfully;
         }
 
-        public async Task<bool> CutVideoFramesAsync(int operationId, string sourcePath, string outputFolder, string videoName, CancellationToken cancellationToken)
+        public async Task<bool> CutVideoFramesAsync(int operationId, string sourcePath, string outputFolder, string videoName, CancellationToken cancellationToken, bool pushProgressNotifications = true)
         {
             TimeSpan? totalDuration = null;
             var processedSuccessfully = true;
@@ -75,25 +75,28 @@ namespace JobsRunner.Services
                     break;
                 }
 
-                if (totalDuration == null)
+                if (pushProgressNotifications)
                 {
-                    var durationMatch = DurationVideoRegex.Match(message);
-                    if (durationMatch.Success)
+                    if (totalDuration == null)
                     {
-                        totalDuration = TimeSpan.Parse(durationMatch.Groups["duration"].Value);
-                        continue;
+                        var durationMatch = DurationVideoRegex.Match(message);
+                        if (durationMatch.Success)
+                        {
+                            totalDuration = TimeSpan.Parse(durationMatch.Groups["duration"].Value);
+                            continue;
+                        }
                     }
-                }
 
-                if (totalDuration.HasValue)
-                {
-                    var progressMatch = ProgressVideoRegex.Match(message);
-                    if (progressMatch.Success)
+                    if (totalDuration.HasValue)
                     {
-                        var current = TimeSpan.Parse(progressMatch.Groups["time"].Value);
-                        var progress = (int)Math.Round(current.TotalSeconds * 100 / totalDuration.Value.TotalSeconds);
+                        var progressMatch = ProgressVideoRegex.Match(message);
+                        if (progressMatch.Success)
+                        {
+                            var current = TimeSpan.Parse(progressMatch.Groups["time"].Value);
+                            var progress = (int)Math.Round(current.TotalSeconds * 100 / totalDuration.Value.TotalSeconds);
 
-                        _operationStatusManager.UpdateOperationProgress(operationId, VideoProcess.CuttingIntoFrames, progress);
+                            await _operationStatusManager.UpdateOperationProgress(operationId, VideoProcess.CuttingIntoFrames, progress);
+                        }
                     }
                 }
             }

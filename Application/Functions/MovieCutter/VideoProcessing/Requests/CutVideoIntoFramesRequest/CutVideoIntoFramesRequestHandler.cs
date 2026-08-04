@@ -3,7 +3,6 @@ using Application.Interfaces;
 using CoreModels.TechnicalEnums;
 using CoreModels.TechnicalModels;
 using Domain.BusinessEnums;
-using Domain.BusinessModels.DatabaseModels;
 using Domain.ConsumersContracts;
 using Domain.TechnicalModels;
 using MassTransit;
@@ -18,7 +17,7 @@ namespace Application.Functions.MovieCutter.VideoProcessing.Requests.CutVideoInt
         {
             if (string.IsNullOrEmpty(request.SourceVideoFullPath)) return new BaseResponse(false, ResponseStatus.ValidationError, "SourceVideoFullPath cannot be empty");
 
-            var operation = new Operation
+            var operation = new Domain.BusinessModels.DatabaseModels.Operation
             {
                 OperationType = OperationType.CuttingIntoFramesOnly,
                 VideoProcess = VideoProcess.CuttingIntoFrames,

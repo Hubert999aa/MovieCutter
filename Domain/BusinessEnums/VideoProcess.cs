@@ -4,7 +4,8 @@
     {
         Undefined = 0,
         Downloading = 1,
-        CuttingIntoPieces = 2,
-        CuttingIntoFrames = 3,
+        DownloadingMetadata = 2,
+        CuttingIntoPieces = 3,
+        CuttingIntoFrames = 4
     }
 }

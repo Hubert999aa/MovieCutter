@@ -11,7 +11,7 @@ namespace JobsRunner.Consumers
         public async Task Consume(ConsumeContext<CutVideoIntoPicesMessage> context)
         {
             var operationId = context.Message.Operation.IdOperation;
-            _operationStatusManager.UpdateOperationStatus(operationId, OperationStatus.Processing);
+            await _operationStatusManager.UpdateOperationStatus(operationId, OperationStatus.Processing);
 
             var videoNumber = 1;
             var processedSuccessfully = true;
@@ -22,19 +22,19 @@ namespace JobsRunner.Consumers
                 processedSuccessfully = await _videoProcessor.CutVideoPieceAsync(piece, context.Message.SourceVideoPath, newVideoPathWithoutExtension, context.Message.Operation.VideoExtension, videoNumber, context.CancellationToken);
                 if (!processedSuccessfully)
                 {
-                    _operationStatusManager.UpdateOperationStatus(operationId, OperationStatus.Error);
+                    await _operationStatusManager.UpdateOperationStatus(operationId, OperationStatus.Error);
                     break;
                 }
 
                 var progress = (int)Math.Round(videoNumber * 100.0 / context.Message.NewPieces.Count());
-                _operationStatusManager.UpdateOperationProgress(operationId, VideoProcess.CuttingIntoPieces, progress);
+                await _operationStatusManager.UpdateOperationProgress(operationId, VideoProcess.CuttingIntoPieces, progress);
 
                 videoNumber++;
             }
 
             if (processedSuccessfully)
             {
-                _operationStatusManager.UpdateOperationStatus(operationId, OperationStatus.Finished);
+                await _operationStatusManager.UpdateOperationStatus(operationId, OperationStatus.Finished);
             }
         }
     }

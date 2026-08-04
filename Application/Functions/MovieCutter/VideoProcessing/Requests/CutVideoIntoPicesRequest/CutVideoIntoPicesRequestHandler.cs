@@ -3,7 +3,6 @@ using Application.Interfaces;
 using CoreModels.TechnicalEnums;
 using CoreModels.TechnicalModels;
 using Domain.BusinessEnums;
-using Domain.BusinessModels.DatabaseModels;
 using Domain.ConsumersContracts;
 using Domain.TechnicalModels;
 using MassTransit;
@@ -19,7 +18,7 @@ namespace Application.Functions.MovieCutter.VideoProcessing.Requests.CutVideoInt
             var validationResponse = this.ValidateRequest(request);
             if (!validationResponse.Success) return validationResponse;
 
-            var operation = new Operation
+            var operation = new Domain.BusinessModels.DatabaseModels.Operation
             {
                 OperationType = OperationType.CuttingIntoPiecesOnly,
                 VideoProcess = VideoProcess.CuttingIntoPieces,
