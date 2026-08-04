@@ -11,5 +11,6 @@ namespace Domain.BusinessModels.DatabaseModels
         public OperationStatus OperationStatus { get; set; } = OperationStatus.Queued;
         public VideoProcess VideoProcess { get; set; }
         public int ProgressPercentage { get; set; } = 0;
+        public DateTime CreationnDate { get; set; } = DateTime.UtcNow;
     }
 }
