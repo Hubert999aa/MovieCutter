@@ -1,10 +1,11 @@
 using Application;
 using Application.Functions.Maintenance.ApplyDatabaseMigrationsCommand;
+using Domain.TechnicalModels;
+using MassTransit;
+using MovieCutterAPI.Hubs;
 using MyMediator.Interfaces;
 using Persistance;
 using Serilog;
-using Domain.TechnicalModels;
-using MassTransit;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +22,8 @@ builder.Services.AddPersistanceLayer(builder.Configuration);
 var rabbitMqSettings = builder.Configuration.GetSection("RabbitMQ")
                 .Get<RabbitMQBaseSettings>()
                 ?? throw new InvalidOperationException("RabbitMQ configuration is missing");
+
+builder.Services.AddSignalR();
 
 builder.Services.AddMassTransit(x =>
 {
@@ -41,9 +44,10 @@ builder.Services.AddCors(options =>
     options.AddPolicy("OpenCors", policy =>
     {
         policy
-            .AllowAnyOrigin()
+            .WithOrigins("http://localhost:4200")
+            .AllowAnyHeader()
             .AllowAnyMethod()
-            .AllowAnyHeader();
+            .AllowCredentials();
     });
 });
 
@@ -52,6 +56,7 @@ var app = builder.Build();
 app.UseCors("OpenCors");
 
 app.MapControllers();
+app.MapHub<OperationsProgressHub>("/hubs/operationsProgress");
 
 using (var serviceScope = app.Services.CreateScope())
 {
@@ -62,8 +67,3 @@ using (var serviceScope = app.Services.CreateScope())
 }
 
 app.Run();
-
-//ToDo:
-// 1. Add more data logging - so we would know what and where happend during docker runs
-// 2. Add possibility to check current progress of every process
-// 3. Create tests in the application

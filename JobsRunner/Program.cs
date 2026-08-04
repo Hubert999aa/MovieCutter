@@ -28,6 +28,9 @@ builder.Services.AddPersistanceLayer(builder.Configuration);
 // JobRunner services
 builder.Services.AddScoped<IVideoDownloader, VideoDownloaderService>();
 builder.Services.AddScoped<IVideoProcessor, VideoProcessorService>();
+builder.Services.AddSingleton<IOperationStatusManager, OperationStatusManagerService>();
+
+builder.Services.AddHostedService<SignalRInitializer>();
 
 var host = builder.Build();
 
