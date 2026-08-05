@@ -54,10 +54,17 @@
               [formControl]="urlControl"
               autocomplete="off"
               aria-label="Link do wideo"
+              [attr.aria-invalid]="urlControl.hasError('unsupportedVideoUrl') && urlControl.touched ? 'true' : null"
+              [attr.aria-describedby]="urlControl.hasError('unsupportedVideoUrl') && urlControl.touched ? 'link-err' : null"
               (keydown.enter)="submit()"
             />
           </div>
         </div>
+        @if (urlControl.hasError('unsupportedVideoUrl') && urlControl.touched) {
+          <p id="link-err" class="link-error" role="alert">
+            Nie rozpoznano identyfikatora wideo. Obsługiwane serwisy: YouTube, Instagram, TikTok.
+          </p>
+        }
       </section>
     }
 
