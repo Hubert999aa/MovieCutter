@@ -2,11 +2,6 @@
 {
     public class FileNamer
     {
-        public static string CreateNewVideoPiceName (string sourceFileName, string sourceFileExtension, int index)
-        {
-            return $"{sourceFileName}_pice_{index}.{sourceFileExtension}";
-        }
-
         public static string GetFileNameWithoutExtension(string fullPath)
         {
             if (string.IsNullOrWhiteSpace(fullPath))

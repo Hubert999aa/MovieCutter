@@ -6,5 +6,6 @@ namespace Application.Functions.MovieCutter.VideoProcessing.Requests.DownloadVid
     public class DownloadVideoRequest : IRequest<BaseResponse>
     {
         public required string Url { get; set; }
+        public required string VideoName { get; set; }
     }
 }

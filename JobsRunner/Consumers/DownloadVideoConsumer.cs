@@ -1,30 +1,35 @@
-﻿using Domain.ConsumersContracts;
-using Application.Helpers;
+﻿using Application.Interfaces;
+using Domain.BusinessEnums;
+using Domain.ConsumersContracts;
+using JobsRunner.Interfaces;
 using MassTransit;
-using System.Diagnostics;
 
 namespace JobsRunner.Consumers
 {
-    public class DownloadVideoConsumer(ILogger<DownloadVideoConsumer> logger) : IConsumer<DownloadVideoMessage>
+    public class DownloadVideoConsumer(IOperationStatusManager _operationStatusManager, IVideoDownloader _videoDownloader) : IConsumer<DownloadVideoMessage>
     {
         public async Task Consume(ConsumeContext<DownloadVideoMessage> context)
         {
-            logger.LogInformation("Setup download process");
+            var operationId = context.Message.Operation.IdOperation;
+            await _operationStatusManager.UpdateOperationStatus(operationId, OperationStatus.Processing);
 
-            var startInfo = new ProcessStartInfo
+            var downloadedSuccessfully = await _videoDownloader.DownloadVideoNameAndExtensionAsync(context.Message.Url, operationId, context.CancellationToken);
+            if (!downloadedSuccessfully)
             {
-                FileName = "yt-dlp",
-                Arguments = $"-o \"%(id)s.%(ext)s\" {context.Message.Url}",
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                CreateNoWindow = true,
-                WorkingDirectory = context.Message.OutputFolder,
-            };
+                await _operationStatusManager.UpdateOperationStatus(operationId, OperationStatus.Error);
+                return;
+            }
 
-            await ProcessRunner.RunProcess(startInfo, context.CancellationToken, true);
+            await _operationStatusManager.UpdateOperationProgress(operationId, VideoProcess.DownloadingMetadata);
 
-            logger.LogInformation("Download process finished");
+            downloadedSuccessfully = await _videoDownloader.DownloadVideoAsync(context.Message.Url, context.Message.OutputFolder, operationId, context.CancellationToken);
+            if (!downloadedSuccessfully)
+            {
+                await _operationStatusManager.UpdateOperationStatus(operationId, OperationStatus.Error);
+                return;
+            }
+
+            await _operationStatusManager.UpdateOperationStatus(operationId, OperationStatus.Finished);
         }
     }
 }

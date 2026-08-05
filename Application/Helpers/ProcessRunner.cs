@@ -1,83 +1,54 @@
-﻿using Microsoft.Extensions.Logging;
-using Serilog;
+﻿using Serilog;
 using System.Diagnostics;
+using System.Threading.Channels;
 
 namespace Application.Helpers
 {
-    public class ProcessRunner(ILogger<ProcessRunner> logger)
+    public class ProcessRunner()
     {
-        public async static Task RunProcess(ProcessStartInfo processInfo, CancellationToken cancellationToken, bool showConsoleLogs = false)
+        public async static Task RunProcess(ProcessStartInfo processInfo, ChannelWriter<string> writer, CancellationToken cancellationToken)
         {
             using (var process = new Process { StartInfo = processInfo, EnableRaisingEvents = true })
             {
-                if (process != null)
+                if (process == null)
                 {
-                    if (showConsoleLogs)
-                    {
-                        process.ErrorDataReceived += (sender, e) =>
-                        {
-                            if (!string.IsNullOrEmpty(e.Data))
-                                Log.Debug(e.Data);
-                        };
+                    Log.Fatal($"Process '{processInfo.FileName}' couldn't be started.");
+                    Environment.Exit(1);
+                }
 
-                        process.OutputDataReceived += (sender, e) =>
-                        {
-                            if (!string.IsNullOrEmpty(e.Data))
-                                Log.Debug(e.Data);
-                        };
+                process.ErrorDataReceived += async (sender, e) =>
+                {
+                    if (!string.IsNullOrEmpty(e.Data))
+                    {
+                        await writer.WriteAsync($"[Error] {e.Data}", cancellationToken);
                     }
+                };
 
-                    process.Start();
-
-                    using var registration = cancellationToken.Register(() =>
+                process.OutputDataReceived += async (sender, e) =>
+                {
+                    if (!string.IsNullOrEmpty(e.Data))
                     {
-                        if (!process.HasExited)
-                        {
-                            Log.Warning("Process killed by cancellationToken");
-                            process.Kill(entireProcessTree: true);
-                        }
-                    });
+                        await writer.WriteAsync($"[Message] {e.Data}", cancellationToken);
+                    }
+                };
 
-                    process.BeginErrorReadLine();
-                    process.BeginOutputReadLine();
+                process.Start();
 
-                    await process.WaitForExitAsync();
-
-                    process.Close();
-                    process.Dispose();
-                }
-                else
+                using var registration = cancellationToken.Register(() =>
                 {
-                    Log.Fatal($"Nie udało się uruchomić procesu: {processInfo.FileName}.");
-                    Environment.Exit(1);
-                }
-            }
-        }
+                    if (!process.HasExited)
+                    {
+                        Log.Warning("Process killed by cancellationToken");
+                        process.Kill(entireProcessTree: true);
+                    }
+                });
 
-        public async static Task<T> RunProcessWithCustomBehaviour<T>(ProcessStartInfo processInfo, CancellationToken cancellationToken, Func<Process, Task<T>> customBehaviour)
-        {
-            using (var process = new Process { StartInfo = processInfo, EnableRaisingEvents = true })
-            {
-                if (process != null)
-                {
-                    process.Start();
+                process.BeginErrorReadLine();
+                process.BeginOutputReadLine();
 
-                    var customResult = await customBehaviour.Invoke(process);
+                await process.WaitForExitAsync(cancellationToken);
 
-                    await process.WaitForExitAsync();
-
-                    process.Close();
-                    process.Dispose();
-
-                    return customResult;
-                }
-                else
-                {
-                    Log.Fatal($"Nie udało się uruchomić procesu: {processInfo.FileName}.");
-                    Environment.Exit(1);
-
-                    return default;
-                }
+                writer.Complete();
             }
         }
     }

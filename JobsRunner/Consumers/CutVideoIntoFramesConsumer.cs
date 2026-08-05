@@ -1,31 +1,26 @@
-﻿using Domain.ConsumersContracts;
-using Application.Helpers;
+﻿using Domain.BusinessEnums;
+using Domain.ConsumersContracts;
+using JobsRunner.Interfaces;
 using MassTransit;
-using System.Diagnostics;
 
 namespace JobsRunner.Consumers
 {
-    public class CutVideoIntoFramesConsumer(ILogger<CutVideoIntoFramesConsumer> logger) : IConsumer<CutVideoIntoFramesMessage>
+    public class CutVideoIntoFramesConsumer(IOperationStatusManager _operationStatusManager, IVideoProcessor _videoProcessor) : IConsumer<CutVideoIntoFramesMessage>
     {
         public async Task Consume(ConsumeContext<CutVideoIntoFramesMessage> context)
         {
-            logger.LogInformation("Setup cutting into frames process");
+            var operationId = context.Message.Operation.IdOperation;
+            await _operationStatusManager.UpdateOperationStatus(operationId, OperationStatus.Processing);
 
-            Directory.CreateDirectory(context.Message.OutputFolder);
+            var outputFolder = context.Message.FramesFolderPath + context.Message.Operation.VideoName + "\\";
+            Directory.CreateDirectory(outputFolder);
 
-            var startInfo = new ProcessStartInfo
-            {
-                FileName = "ffmpeg",
-                Arguments = $"-i \"{context.Message.SourceVideoPath}\" -fps_mode passthrough \"{Path.Combine(context.Message.OutputFolder, $"{context.Message.VideoName}_%06d.png")}\"",
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                CreateNoWindow = true,
-            };
+            var processedSuccessfully = await _videoProcessor.CutVideoFramesAsync(context.Message.Operation.IdOperation, context.Message.SourceVideoPath, outputFolder, context.Message.Operation.VideoName, context.CancellationToken);
 
-            await ProcessRunner.RunProcess(startInfo, context.CancellationToken, true);
-
-            logger.LogInformation("Cutting into frames process finished");
+            if (processedSuccessfully)
+                await _operationStatusManager.UpdateOperationStatus(operationId, OperationStatus.Finished);
+            else
+                await _operationStatusManager.UpdateOperationStatus(operationId, OperationStatus.Error);
         }
     }
 }

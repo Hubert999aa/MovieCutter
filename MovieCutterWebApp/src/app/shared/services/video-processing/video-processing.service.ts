@@ -9,8 +9,8 @@ import { DownloadAndCutVideoRequest } from '@shared/models/api-models/video-proc
 export class VideoProcessingService {
   private readonly videoProcessingApi = inject(VideoProcessingApi);
 
-  requestVideoDownload(videoUrl: string): Observable<Object> {
-    return this.videoProcessingApi.requestVideoDownload(videoUrl);
+  requestVideoDownload(videoUrl: string, videoName: string): Observable<Object> {
+    return this.videoProcessingApi.requestVideoDownload(videoUrl, videoName);
   }
 
   requestVideoCuttingIntoPices(request: VideoCuttingIntoPicesRequest): Observable<Object> {

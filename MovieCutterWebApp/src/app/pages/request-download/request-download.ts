@@ -24,6 +24,7 @@ import { VideoProcessingService } from '@shared/services/video-processing/video-
 import { LoaderComponent } from '@shared/components/loader/loader';
 import { sourcesConfig } from '@shared/static-data/sources-config';
 import { getAvatarColor, getInitials } from '@shared/helpers/avatar.helper';
+import { extractVideoIdFromUrl } from '@shared/helpers/video-url.helper';
 
 export type DownloadMode = 'link' | 'profile';
 export type ProcessingAction = 'download-only' | 'download-and-cut';
@@ -39,6 +40,14 @@ function timeFormatValidator(): ValidatorFn {
     const v = control.value as string;
     if (!v) return null;
     return /^\d{2}:\d{2}:\d{2}$/.test(v) ? null : { timeFormat: true };
+  };
+}
+
+function supportedVideoUrlValidator(): ValidatorFn {
+  return (control: AbstractControl) => {
+    const v = control.value as string;
+    if (!v) return null;
+    return extractVideoIdFromUrl(v) ? null : { unsupportedVideoUrl: true };
   };
 }
 
@@ -66,7 +75,7 @@ export class RequestDownloadComponent implements OnInit {
 
   readonly urlControl = new FormControl('', {
     nonNullable: true,
-    validators: [Validators.required],
+    validators: [Validators.required, supportedVideoUrlValidator()],
   });
 
   readonly profiles = signal<Profile[]>([]);
@@ -173,17 +182,28 @@ export class RequestDownloadComponent implements OnInit {
     }
   }
 
-  private getUrl(): string {
-    return this.mode() === 'link'
-      ? this.urlControl.value
-      : (this.selectedVideo()?.url ?? '');
+  /**
+   * Zwraca link i identyfikator wideo wymagany przez API.
+   * W trybie profilu jest to `idVideo` z listy, w trybie linku — id zasobu wydzielone z URL-a.
+   */
+  private getVideoRequestData(): { url: string; videoName: string } | null {
+    if (this.mode() === 'profile') {
+      const video = this.selectedVideo();
+      return video?.url ? { url: video.url, videoName: video.idVideo } : null;
+    }
+
+    const url = this.urlControl.value.trim();
+    if (!url) return null;
+
+    const videoName = extractVideoIdFromUrl(url);
+    return videoName ? { url, videoName } : null;
   }
 
   private submitDownloadOnly(): void {
-    const url = this.getUrl();
-    if (!url) return;
+    const data = this.getVideoRequestData();
+    if (!data) return;
     this.submitting.set(true);
-    this.videoProcessingService.requestVideoDownload(url).subscribe({
+    this.videoProcessingService.requestVideoDownload(data.url, data.videoName).subscribe({
       next: () => {
         this.submitting.set(false);
         this.router.navigate(['/']);
@@ -196,8 +216,8 @@ export class RequestDownloadComponent implements OnInit {
   }
 
   private submitDownloadAndCut(): void {
-    const url = this.getUrl();
-    if (!url) return;
+    const data = this.getVideoRequestData();
+    if (!data) return;
 
     const cutVideoInOnePiece = this.cuttingMode() === 'frames';
     const videoPices =
@@ -210,7 +230,12 @@ export class RequestDownloadComponent implements OnInit {
 
     this.submitting.set(true);
     this.videoProcessingService
-      .requestDownloadAndCutVideo({ url, cutVideoInOnePiece, videoPices })
+      .requestDownloadAndCutVideo({
+        url: data.url,
+        videoName: data.videoName,
+        cutVideoInOnePiece,
+        videoPices,
+      })
       .subscribe({
         next: () => {
           this.submitting.set(false);

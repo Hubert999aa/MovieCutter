@@ -10,8 +10,8 @@ export class VideoProcessingApi {
   private readonly httpWrapper = inject(HttpWrapper);
   private readonly videoProcessingBaseUrl = '/api/videoProcessing';
 
-  requestVideoDownload(videoUrl: string): Observable<Object> {
-    return this.httpWrapper.post<Object>(`${this.videoProcessingBaseUrl}/runVideoDownloading`, { Url: videoUrl });
+  requestVideoDownload(videoUrl: string, videoName: string): Observable<Object> {
+    return this.httpWrapper.post<Object>(`${this.videoProcessingBaseUrl}/runVideoDownloading`, { Url: videoUrl, VideoName: videoName });
   }
 
   requestVideoCuttingIntoPices(request: VideoCuttingIntoPicesRequest): Observable<Object> {

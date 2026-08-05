@@ -1,5 +1,9 @@
+using Application;
 using JobsRunner;
+using JobsRunner.Interfaces;
 using JobsRunner.Options;
+using JobsRunner.Services;
+using Persistance;
 using Serilog;
 
 var builder = Host.CreateApplicationBuilder(args);
@@ -17,7 +21,16 @@ var rabbitMqSettings = builder.Configuration
 // MassTransit
 JobsRunnerStartupConfiguration.ConfigureMassTransit(builder.Services, builder.Configuration, rabbitMqSettings);
 
+// Persistance and Application
+builder.Services.AddApplicationLayer(builder.Configuration);
+builder.Services.AddPersistanceLayer(builder.Configuration);
 
+// JobRunner services
+builder.Services.AddScoped<IVideoDownloader, VideoDownloaderService>();
+builder.Services.AddScoped<IVideoProcessor, VideoProcessorService>();
+builder.Services.AddSingleton<IOperationStatusManager, OperationStatusManagerService>();
+
+builder.Services.AddHostedService<SignalRInitializer>();
 
 var host = builder.Build();
 

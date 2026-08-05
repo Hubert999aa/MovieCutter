@@ -13,51 +13,56 @@
     </div>
   </div>
 
-  <!-- Task list -->
-  @if (tasks().length > 0) {
+  @if (loading()) {
+    <!-- Loading state -->
+    <div class="tq__loader">
+      <app-loader variant="rows" [count]="3" />
+    </div>
+  } @else if (operations().length > 0) {
+    <!-- Task list -->
     <ul class="tq__list" aria-label="Lista zadań">
-      @for (task of tasks(); track task.id) {
+      @for (operation of operations(); track operation.idOperation) {
         <li
           class="tq__item"
-          [attr.data-status]="task.status"
-          [attr.aria-label]="typeConfig[task.type].label + ': ' + task.name + ', status: ' + statusConfig[task.status].label"
+          [attr.data-status]="operation.operationStatus"
+          [attr.aria-label]="typeConfig[operation.operationType].label + ': ' + operation.videoName + ', status: ' + statusConfig[operation.operationStatus].label"
         >
 
           <!-- Type icon -->
           <div class="tq__type-icon" aria-hidden="true">
-            <i [class]="typeConfig[task.type].icon"></i>
+            <i [class]="typeConfig[operation.operationType].icon"></i>
           </div>
 
           <!-- Info -->
           <div class="tq__info">
-            <span class="tq__name">{{ task.name }}</span>
-            <span class="tq__type-label">{{ typeConfig[task.type].label }}</span>
+            <span class="tq__name">{{ operation.videoName }}</span>
+            <span class="tq__type-label">{{ typeConfig[operation.operationType].label }}</span>
 
-            <!-- Progress bar (only when processing) -->
-            @if (task.status === 'processing' && task.progress !== undefined) {
+            <!-- Progress bar (only while the operation is running) -->
+            @if (showProgress(operation)) {
               <div
                 class="tq__progress"
                 role="progressbar"
-                [attr.aria-valuenow]="task.progress"
+                [attr.aria-valuenow]="operation.progressPercentage"
                 aria-valuemin="0"
                 aria-valuemax="100"
-                [attr.aria-label]="'Postęp: ' + task.progress + '%'"
+                [attr.aria-label]="'Postęp: ' + operation.progressPercentage + '%'"
               >
                 <div class="tq__progress-track">
                   <div
                     class="tq__progress-fill"
-                    [style.width.%]="task.progress"
+                    [style.width.%]="operation.progressPercentage"
                   ></div>
                 </div>
-                <span class="tq__progress-pct" aria-hidden="true">{{ task.progress }}%</span>
+                <span class="tq__progress-pct" aria-hidden="true">{{ operation.progressPercentage }}%</span>
               </div>
             }
           </div>
 
           <!-- Status badge -->
-          <div class="tq__status" [attr.data-status]="task.status" aria-hidden="true">
-            <i [class]="statusConfig[task.status].icon"></i>
-            <span>{{ statusConfig[task.status].label }}</span>
+          <div class="tq__status" [attr.data-status]="operation.operationStatus" aria-hidden="true">
+            <i [class]="statusConfig[operation.operationStatus].icon"></i>
+            <span>{{ statusConfig[operation.operationStatus].label }}</span>
           </div>
 
         </li>

@@ -7,7 +7,8 @@ namespace Application.Functions.MovieCutter.VideoProcessing.Requests.DownloadAnd
     public class DownloadAndCutVideoRequest : IRequest<BaseResponse>
     {
         public required string Url { get; set; }
+        public required string VideoName { get; set; }
         public required bool CutVideoInOnePiece { get; set; }
-        public required List<VideoPice> VideoPices { get; set; }
+        public required List<VideoPiece> VideoPices { get; set; }
     }
 }

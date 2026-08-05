@@ -1,36 +1,41 @@
-﻿using Domain.ConsumersContracts;
-using Application.Helpers;
+﻿using Application.Interfaces;
+using Domain.BusinessEnums;
+using Domain.ConsumersContracts;
+using JobsRunner.Interfaces;
 using MassTransit;
-using System.Diagnostics;
 
 namespace JobsRunner.Consumers
 {
-    public class CutVideoIntoPicesConsumer(ILogger<CutVideoIntoPicesConsumer> logger) : IConsumer<CutVideoIntoPicesMessage>
+    public class CutVideoIntoPicesConsumer(IOperationStatusManager _operationStatusManager, IVideoProcessor _videoProcessor) : IConsumer<CutVideoIntoPicesMessage>
     {
         public async Task Consume(ConsumeContext<CutVideoIntoPicesMessage> context)
         {
-            logger.LogInformation("Setup cutting into pices process");
+            var operationId = context.Message.Operation.IdOperation;
+            await _operationStatusManager.UpdateOperationStatus(operationId, OperationStatus.Processing);
+
             var videoNumber = 1;
+            var processedSuccessfully = true;
+            var newVideoPathWithoutExtension = $"{context.Message.DownloadFolderPath}{context.Message.Operation.VideoName}";
 
-            foreach (var pice in context.Message.NewPices)
+            foreach (var piece in context.Message.NewPieces)
             {
-                var newVideoPath = $"{context.Message.NewVideoPathWithoutExtension}_{videoNumber}{context.Message.NewVideoExtension}";
-                var startInfo = new ProcessStartInfo
+                processedSuccessfully = await _videoProcessor.CutVideoPieceAsync(piece, context.Message.SourceVideoPath, newVideoPathWithoutExtension, context.Message.Operation.VideoExtension, videoNumber, context.CancellationToken);
+                if (!processedSuccessfully)
                 {
-                    FileName = "ffmpeg",
-                    Arguments = $"-ss {pice.StartTime} -to {pice.EndTime} -i \"{context.Message.SourceVideoPath}\" -c copy \"{newVideoPath}\"",
-                    UseShellExecute = false,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    CreateNoWindow = true,
-                };
+                    await _operationStatusManager.UpdateOperationStatus(operationId, OperationStatus.Error);
+                    break;
+                }
 
-                await ProcessRunner.RunProcess(startInfo, context.CancellationToken, true);
+                var progress = (int)Math.Round(videoNumber * 100.0 / context.Message.NewPieces.Count());
+                await _operationStatusManager.UpdateOperationProgress(operationId, VideoProcess.CuttingIntoPieces, progress);
 
                 videoNumber++;
             }
 
-            logger.LogInformation("Cutting into pices process finished");
+            if (processedSuccessfully)
+            {
+                await _operationStatusManager.UpdateOperationStatus(operationId, OperationStatus.Finished);
+            }
         }
     }
 }

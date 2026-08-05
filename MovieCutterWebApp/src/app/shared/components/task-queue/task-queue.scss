@@ -2,10 +2,11 @@
 
 .tq__item,
 .tq__status {
-  &[data-status="queued"]     { --s-color: rgba(255, 255, 255, 0.35); --s-bg: rgba(255, 255, 255, 0.05); }
-  &[data-status="processing"] { --s-color: #60a5fa;                   --s-bg: rgba(96, 165, 250, 0.08);  }
-  &[data-status="done"]       { --s-color: #4dd9ac;                   --s-bg: rgba(77, 217, 172, 0.08);  }
-  &[data-status="error"]      { --s-color: #f87171;                   --s-bg: rgba(248, 113, 113, 0.08); }
+  &[data-status="Undefined"]  { --s-color: rgba(255, 255, 255, 0.35); --s-bg: rgba(255, 255, 255, 0.05); }
+  &[data-status="Queued"]     { --s-color: rgba(255, 255, 255, 0.35); --s-bg: rgba(255, 255, 255, 0.05); }
+  &[data-status="Processing"] { --s-color: #60a5fa;                   --s-bg: rgba(96, 165, 250, 0.08);  }
+  &[data-status="Finished"]   { --s-color: #4dd9ac;                   --s-bg: rgba(77, 217, 172, 0.08);  }
+  &[data-status="Error"]      { --s-color: #f87171;                   --s-bg: rgba(248, 113, 113, 0.08); }
 }
 
 // ── Container ─────────────────────────────────────────────────────────────────
@@ -64,6 +65,12 @@
   background: var(--mc-accent);
   box-shadow: 0 0 5px var(--mc-accent);
   animation: tq-pulse 2s ease-in-out infinite;
+}
+
+// ── Loading ───────────────────────────────────────────────────────────────────
+
+.tq__loader {
+  padding: 0.6rem 1.4rem 1rem;
 }
 
 // ── List ──────────────────────────────────────────────────────────────────────
