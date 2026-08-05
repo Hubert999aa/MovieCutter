@@ -69,10 +69,12 @@ namespace JobsRunner.Services
 
             await foreach (var message in messageChannel.Reader.ReadAllAsync())
             {
-                if (message.StartsWith("[Error]") && (message.Contains("Error parsing") || message.Contains("Error muxing") || message.Contains("Task finished with error")))
+                if (message.StartsWith("[Error]") && message.Contains("Task finished with error"))
                 {
+                    _logger.LogWarning(message);
+
                     processedSuccessfully = false;
-                    break;
+                    continue;
                 }
 
                 if (pushProgressNotifications)

@@ -58,6 +58,8 @@ namespace JobsRunner.Consumers
                     var newVideoPath = $"{newVideoPathWithoutExtension}_{videoNumber}.{operation.VideoExtension}";
                     var newVideoName = $"{operation.VideoName}_{videoNumber}";
                     var newOutputFolder = $"{context.Message.FramesOutputFolder}{newVideoName}";
+
+                    Directory.CreateDirectory(newOutputFolder);
                     processedSuccessfully = await _videoProcessor.CutVideoFramesAsync(operationId, newVideoPath, newOutputFolder, newVideoName, context.CancellationToken, false);
                     if (!processedSuccessfully)
                     {

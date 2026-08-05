@@ -1,5 +1,4 @@
-﻿using Application.Interfaces;
-using Domain.BusinessEnums;
+﻿using Domain.BusinessEnums;
 using Domain.ConsumersContracts;
 using JobsRunner.Interfaces;
 using MassTransit;
