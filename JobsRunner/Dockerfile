@@ -3,6 +3,7 @@ WORKDIR /src
 
 COPY ["JobsRunner/JobsRunner.csproj", "JobsRunner/"]
 COPY ["Application/Application.csproj", "Application/"]
+COPY ["Persistance/Persistance.csproj", "Persistance/"]
 COPY ["Domain/Domain.csproj", "Domain/"]
 COPY ["NuGet.Docker.config", "./NuGet.config"]
 COPY ["packages/", "/nuget-local/"]
