@@ -30,9 +30,11 @@ services:
     container_name: movie-cutter-jobs-runner
     environment:
       DOTNET_ENVIRONMENT: Production
+      ConnectionStrings__MovieCutterMSSQL: "Data Source=sqlserver_2022;Initial Catalog=MovieCutter;User ID=sa;Password=Dokurw!0neHaslo123;MultipleActiveResultSets=False;Encrypt=False;TrustServerCertificate=True;Connection Timeout=30;"
       FolderPaths__FramesFolderPath: "/app/storage/frames/"
       FolderPaths__DownloadFolderPath: "/app/storage/vids/"
       Serilog__WriteTo__0__Args__serverUrl: "http://seq:80"
+      SignalR__ConnectionUrl: "http://api:8080/hubs/operationsProgress"
       RabbitMQ__Host: "rabbitmq"
       RabbitMQ__VirtualHost: "/"
       RabbitMQ__Username: "admin"
@@ -56,6 +58,8 @@ services:
       RabbitMQ__Queues__DownloadAndCutVideoSettings__RetryIntervalSeconds: "15"
     volumes:
       - "D:/1. IT/5. Development/Applications/MovieCutter:/app/storage"
+    depends_on:
+      - api
     networks:
       - shared-infra
 
